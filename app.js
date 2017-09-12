@@ -1,14 +1,19 @@
 //create event listener for submiting a form
 document.getElementById('createTaskForm').addEventListener('submit', saveTask);
+document.getElementById('taskArea').style.display = "none";
 
 function saveTask(e) {
 	//prevent form from submitting
 	e.preventDefault();
 	
+	//display taskArea
+	document.getElementById('taskArea').style.display = "block";
+	
 	//get task title, priority and category
 	let taskTitle = document.getElementById('taskTitle').value,
 			taskPriority = document.getElementById('taskPriority').value,
 			taskCategory = document.getElementById('taskCategory').value,
+			itemKey = '';
 			
 	//get form
 			myForm = document.getElementById('createTaskForm');
@@ -23,40 +28,126 @@ function saveTask(e) {
 		category: taskCategory
 	};
 	
-	//initialize empty array to store tasks 
-	let tasksArr = [];
-	//set data to local storage
-	if(localStorage.getItem('tasks') === undefined) {
-		//init taskArr
-		tasksArr = [];
-		
-		//push newTask to taskArr(array)
-		tasksArr.push(newTask);
-		console.log(tasksArr);
-		
-		//convert array to string a set it up to localstorage
-		localStorage.setItem('tasks', JSON.stringify(tasksArr));
-	} else {
-		//parse string stored in localstorage to array/convert string to an array
-		tasksArr = JSON.parse(localStorage.getItem('tasks')) || [];
-		
-		//push newTask to taskArr(array)
-		tasksArr.push(newTask);
-		
-		//re-set localstorage with new task 
-		localStorage.setItem('tasks', JSON.stringify(tasksArr));
+	//check category of newTask
+	if(newTask.category === "Home") {
+		itemKey = 'homeTasks';
+	} else if(newTask.category === "Work") {
+		itemKey = 'workTasks';
+	} else if(newTask.category === "Other") {
+		itemKey = 'otherTasks';
 	}
+	
+	console.log('itemKey: ', itemKey);
+	
+	//initialize empty arrays to store tasks 
+	let homeTasksArr = [],
+			workTaskArr = [],
+			otherTaskArr = [];
+	
+	
+	//If in localstorage there is NO item like
+	//homeTasks or
+	//workTasks or
+	//otherTasks
+	if(localStorage.getItem(itemKey) === null) {
+		//check if new task category is identical to "Home"
+		//and init homeTaskArr to store home tasks data
+		if(newTask.category === "Home") {
+			//init home task array
+			homeTasksArr = [];
+			
+			//push newTask to home task array
+			homeTasksArr.push(newTask)
+			
+			//convert homeTaskArr(array) to string and set it up to localstorage
+			//using JSON data format
+			localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
+			console.log('Operation save new HOME TASK succeed!');
+		}
+		//check if new task category is idetical to "Work"
+		//and init workTaskArr to store work tasks data
+		if(newTask.category === "Work") {
+			//init work task array
+			workTaskArr = [];
+			
+			//push newTask to home task array
+			workTaskArr.push(newTask);
+			
+			//convert workTaskArr to string and set it up to localstorage
+			//using JSON data format
+			localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
+			console.log('Operation: save new WORK TASK succeed!');
+		}
+		//check if new task category is identical to "Other"
+		//and init otherTaskArr to store other tasks data
+		if(newTask.category === "Other") {
+			//init other task array
+			otherTaskArr = [];
+			
+			//push newTask to home task array
+			otherTaskArr.push(newTask);
+			
+			//convert otherTaskArr to string and set it up to localstorage
+			//using JSON data format
+			localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+			console.log('Operation: save new OTHER TASK succeed!');
+		}
+		//Else if there is something in localstorage
+	} else { 
+		//check if new task category is identical to "Home"
+		//and parse JSON data to array
+		//cause we need array format to push newTask there
+		if(newTask.category === "Home") {
+			//parse string stored in localstorage to array/convert string to an array
+			homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
+			
+			//push new task to home task array
+			homeTasksArr.push(newTask);
+			
+			//re-set it up to local storage
+			localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
+			console.log("There was homeTasks before. New task added");
+		}
+		//check if new task category is idetical to "Work"
+		//and parse JSON data to array
+		//cause we need array format to push newTask there
+		if(newTask.category === "Work") {
+			//parse string stored in localstorage to array/convert string to an array
+			workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
+			
+			//push new task to work task array
+			workTaskArr.push(newTask);
+			
+			//re-set it up to local storage
+			localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
+			console.log("There was workTasks before. New task added");
+		}
+		//check if new task category is idetical to "Other"
+		//and parse JSON data to array
+		//cause we need array format to push newTask there
+		if(newTask.category === "Other") {
+			//parse string stored in localstorage to array/convert string to an array
+			otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
+			
+			//push new task to other task array/ add new task
+			otherTaskArr.push(newTask);
+			
+			//re-set it up to local storage
+			localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+			console.log("There was otherTasks before. New task added");
+		}
+	} // end of else
 	
 	//reset form after submiting
 	myForm.reset();
 	
 	//fetch list
-	fetchList(newTask);
+	fetchList(itemKey);
 }
 
-//fetch list using data from localStorage
-function fetchList(newTask) {
-	let tasksArr = JSON.parse(localStorage.getItem('tasks')),
+//fetch list using itemKey form localstorage
+function fetchList(itemKey) {
+	let tasksArr = JSON.parse(localStorage.getItem(itemKey)),
 	
 	//get task output element
 			result = document.getElementById('taskOutput');
