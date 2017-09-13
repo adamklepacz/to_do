@@ -1,5 +1,7 @@
 //create event listener for submiting a form
 document.getElementById('createTaskForm').addEventListener('submit', saveTask);
+
+//create event listeneres for "check task" section
 document.getElementById('showHomeTasks').addEventListener('click', function(){
     fetchList('homeTasks');
 }, true);
@@ -9,7 +11,40 @@ document.getElementById('showWorkTasks').addEventListener('click', function(){
 document.getElementById('showOtherTasks').addEventListener('click', function(){
 	fetchList('otherTasks');
 }, true);
+
+//crete event listener for document
+document.addEventListener('click', handleEvent, true);
+
+//hide taskArea at the very begining
 document.getElementById('taskArea').style.display = "none";
+
+//handle event
+function handleEvent(e) {
+	//event for IE
+	e = event || window.event;
+	e.target = e.target || e.srcElement;
+	
+	let element = e.target;
+	
+	//Climb up the document tree from the target of event
+	while(element) {
+		if(element.nodeName === "BUTTON" && /doneTask/.test(element.className)) {
+			//user click on a <button> or on an element inside a <button>
+			//with class of ".doneTask"
+			//doneTask(element);
+			console.log('execute doneTask function');
+			break;
+		}
+		if(element.nodeName === "BUTTON" && /deleteTask/.test(element.className)) {
+			//user click on a <button> or on an element inside a <button>
+			//with class of ".deleteTask"
+			//deleteTask(element);
+			console.log('execute deleteTask function');
+			break;
+		}
+		element = element.parentNode;
+	}
+}
 
 function saveTask(e) {
 	//prevent form from submitting
@@ -156,6 +191,10 @@ function saveTask(e) {
 
 //fetch list using itemKey form localstorage
 function fetchList(itemKey) {
+	//display taskArea
+	document.getElementById('taskArea').style.display = "block";
+	
+	//get taskArr from localstorage
 	let tasksArr = JSON.parse(localStorage.getItem(itemKey)),
 	
 	//get task output element
@@ -174,14 +213,16 @@ function fetchList(itemKey) {
 	for(let i = 0; i < tasksArr.length; i++) {
 		let title = tasksArr[i].title,
 				priority = tasksArr[i].priority,
-				category = tasksArr[i].category;
+				category = tasksArr[i].category,
+				taskId = Math.floor(Math.random() * 99999);
+		console.log(taskId);
 		
 		result.innerHTML +=
 				`
-					<li class="list-group-item mb-3">${title}
+					<li id="${taskId}" class="list-group-item mb-3">${title}
 						<div class="btn-group float-right">
-							<button class="btn btn-secondary">Done</button>
-							<button class="btn btn-danger">Delete</button>
+							<button class="btn btn-secondary doneTask">Done</button>
+							<button class="btn btn-danger deleteTask">Delete</button>
 						</div>
 					</li>
 				`;
