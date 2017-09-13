@@ -1,5 +1,14 @@
 //create event listener for submiting a form
 document.getElementById('createTaskForm').addEventListener('submit', saveTask);
+document.getElementById('showHomeTasks').addEventListener('click', function(){
+    fetchList('homeTasks');
+}, true);
+document.getElementById('showWorkTasks').addEventListener('click', function(){
+	fetchList('workTasks');
+}, true);
+document.getElementById('showOtherTasks').addEventListener('click', function(){
+	fetchList('otherTasks');
+}, true);
 document.getElementById('taskArea').style.display = "none";
 
 function saveTask(e) {
@@ -150,9 +159,15 @@ function fetchList(itemKey) {
 	let tasksArr = JSON.parse(localStorage.getItem(itemKey)),
 	
 	//get task output element
-			result = document.getElementById('taskOutput');
+			resultCategory = document.getElementById('taskCategoryInner'),
+			result = document.getElementById('taskOutput'),
+			
+			
+	//Result category inner html
+			resultCategoryInnerHtml = tasksArr[0].category;
 	
-	//init empty "place" for result
+	//init empty "place" for results
+	resultCategory.innerHTML = resultCategoryInnerHtml;
 	result.innerHTML = '';
 	
 	//loop over taskArr elements 
@@ -171,48 +186,6 @@ function fetchList(itemKey) {
 					</li>
 				`;
 	}
-	
-	/*
-	//fetch home tasks
-	if(newTask.category === "Home") {
-		
-		
-		//get tasks from localstorage
-		let homeTaskArr = JSON.parse(localStorage.getItem('tasks'));
-		
-		//get html outpu element 
-		let result = document.getElementById('taskOutpu');
-		
-		//init empty place/string for result
-		result.innerHTML = '';
-		
-		//loop over all homeTaskArr
-		for(let i = 0; i < homeTaskArr.length; i++) {
-			let title = homeTaskArr[i].title,
-					category = homeTaskArr[i].category,
-					priority = homeTaskArr[i].category;
-		}
-		
-	}
-	
-	//work tasks
-	if(tasks.category === "Work") {
-		let workTasks = {
-			title: tasks.title,
-			priority: tasks.priority,
-			category: tasks.category
-		}
-	}
-	
-	//Other tasks
-	if(tasks.category === "Other") {
-		let otherTasks = {
-			title: tasks.title,
-			priority: tasks.priority,
-			category: tasks.category
-		}
-	}
-  */
 	console.log("END OF FETCH FUNCTION");
 }
 
