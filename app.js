@@ -18,31 +18,45 @@ document.addEventListener('click', handleEvent, true);
 //hide taskArea at the very begining
 document.getElementById('taskArea').style.display = "none";
 
-//handle event
+function makeId() {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for (var i = 0; i < 5; i++)
+    text += possible.charAt(Math.floor(Math.random() * possible.length));
+		text += Math.floor(Math.random() * 99999);
+	console.log(text);
+  return text;
+}
+
+//handle event for multiple done and delete buttons
 function handleEvent(e) {
 	//event for IE
 	e = event || window.event;
 	e.target = e.target || e.srcElement;
 	
-	let element = e.target;
+	//get clicked <button>
+	let clickedButton = e.target;
+	
+	//get clicked task <li>
+	let clickedTask = e.target.closest('li.taskItem');
 	
 	//Climb up the document tree from the target of event
-	while(element) {
-		if(element.nodeName === "BUTTON" && /doneTask/.test(element.className)) {
+	while(clickedButton) {
+		if(clickedButton.nodeName === "BUTTON" && /doneTask/.test(clickedButton.className)) {
 			//user click on a <button> or on an element inside a <button>
 			//with class of ".doneTask"
-			//doneTask(element);
-			console.log('execute doneTask function');
+			doneTask(clickedTask, clickedButton);
 			break;
 		}
-		if(element.nodeName === "BUTTON" && /deleteTask/.test(element.className)) {
+		if(clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
 			//user click on a <button> or on an element inside a <button>
 			//with class of ".deleteTask"
 			//deleteTask(element);
-			console.log('execute deleteTask function');
+			console.log(clickedButton,'execute deleteTask function');
 			break;
 		}
-		element = element.parentNode;
+		clickedButton = clickedButton.parentNode;
 	}
 }
 
@@ -57,7 +71,10 @@ function saveTask(e) {
 	let taskTitle = document.getElementById('taskTitle').value,
 			taskPriority = document.getElementById('taskPriority').value,
 			taskCategory = document.getElementById('taskCategory').value,
-			itemKey = '';
+			itemKey = '',
+			taskId = makeId(),
+			isTaskDone = false;
+			console.log(taskId);
 			
 	//get form
 			myForm = document.getElementById('createTaskForm');
@@ -69,7 +86,9 @@ function saveTask(e) {
 	newTask = {
 		title: taskTitle,
 		priority: taskPriority,
-		category: taskCategory
+		category: taskCategory,
+		id: taskId,
+		isTaskDone: isTaskDone //boolean
 	};
 	
 	//check category of newTask
@@ -214,20 +233,48 @@ function fetchList(itemKey) {
 		let title = tasksArr[i].title,
 				priority = tasksArr[i].priority,
 				category = tasksArr[i].category,
-				taskId = Math.floor(Math.random() * 99999);
-		console.log(taskId);
-		
+				id = tasksArr[i].id,
+				isDone = tasksArr[i].isTaskDone;
+
 		result.innerHTML +=
 				`
-					<li id="${taskId}" class="list-group-item mb-3">${title}
+					<li id="${id}" class="list-group-item mb-3 taskItem">${title}
 						<div class="btn-group float-right">
-							<button class="btn btn-secondary doneTask">Done</button>
-							<button class="btn btn-danger deleteTask">Delete</button>
+							<button id="${id}" class="btn btn-secondary doneTask">Done</button>
+							<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
 						</div>
 					</li>
 				`;
+		
+		//get currentTask
+		let currentTask = document.getElementById(id);
+		console.log('CurrentTask:', currentTask);
+		
+		//check if task is done
+		if(isDone) {
+			currentTask.style.textDecoration = "line-through";
+		} else {
+			currentTask.style.textDecoration = "none";	
+		}
 	}
 	console.log("END OF FETCH FUNCTION");
+}
+
+function doneTask(clickedTask, element) {
+	//get current taskList
+//	let currentTasksList = JSON.parse(localStorage.getItem())
+	//check if task id is euqal to id of clicked done button
+	//and cross text which is inside <li> tag
+	let buttonId = element.getAttribute('id'),
+			clickedTaskId = clickedTask.getAttribute('id'),
+			doneElement = document.getElementById(clickedTaskId);
+	
+	console.log('Inside doneTask: clickedTaskID',clickedTaskId,'clickedButtonID', buttonId);
+	if(buttonId === clickedTaskId) {
+		doneElement.style.textDecoration = "line-through";
+	} else {
+		//console.log('Handle other possibility...');
+	}
 }
 
 
