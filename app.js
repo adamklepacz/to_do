@@ -82,6 +82,9 @@ function saveTask(e) {
 	//init empty object for storing a task
 	let newTask = {};
 	
+	//add task postfix to category
+	taskCategory += "Task";
+	
 	//set title, priority and category to newTask object
 	newTask = {
 		title: taskTitle,
@@ -92,11 +95,11 @@ function saveTask(e) {
 	};
 	
 	//check category of newTask
-	if(newTask.category === "Home") {
+	if(newTask.category === "HomeTask") {
 		itemKey = 'homeTasks';
-	} else if(newTask.category === "Work") {
+	} else if(newTask.category === "WorkTask") {
 		itemKey = 'workTasks';
-	} else if(newTask.category === "Other") {
+	} else if(newTask.category === "OtherTask") {
 		itemKey = 'otherTasks';
 	}
 	
@@ -115,7 +118,7 @@ function saveTask(e) {
 	if(localStorage.getItem(itemKey) === null) {
 		//check if new task category is identical to "Home"
 		//and init homeTaskArr to store home tasks data
-		if(newTask.category === "Home") {
+		if(newTask.category === "HomeTask") {
 			//init home task array
 			homeTasksArr = [];
 			
@@ -129,7 +132,7 @@ function saveTask(e) {
 		}
 		//check if new task category is idetical to "Work"
 		//and init workTaskArr to store work tasks data
-		if(newTask.category === "Work") {
+		if(newTask.category === "WorkTask") {
 			//init work task array
 			workTaskArr = [];
 			
@@ -143,7 +146,7 @@ function saveTask(e) {
 		}
 		//check if new task category is identical to "Other"
 		//and init otherTaskArr to store other tasks data
-		if(newTask.category === "Other") {
+		if(newTask.category === "OtherTask") {
 			//init other task array
 			otherTaskArr = [];
 			
@@ -160,7 +163,7 @@ function saveTask(e) {
 		//check if new task category is identical to "Home"
 		//and parse JSON data to array
 		//cause we need array format to push newTask there
-		if(newTask.category === "Home") {
+		if(newTask.category === "HomeTask") {
 			//parse string stored in localstorage to array/convert string to an array
 			homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
 			
@@ -174,7 +177,7 @@ function saveTask(e) {
 		//check if new task category is idetical to "Work"
 		//and parse JSON data to array
 		//cause we need array format to push newTask there
-		if(newTask.category === "Work") {
+		if(newTask.category === "WorkTask") {
 			//parse string stored in localstorage to array/convert string to an array
 			workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
 			
@@ -188,7 +191,7 @@ function saveTask(e) {
 		//check if new task category is idetical to "Other"
 		//and parse JSON data to array
 		//cause we need array format to push newTask there
-		if(newTask.category === "Other") {
+		if(newTask.category === "OtherTask") {
 			//parse string stored in localstorage to array/convert string to an array
 			otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
 			
@@ -235,10 +238,11 @@ function fetchList(itemKey) {
 				category = tasksArr[i].category,
 				id = tasksArr[i].id,
 				isDone = tasksArr[i].isTaskDone;
+		console.log('task is done', isDone);
 
 		result.innerHTML +=
 				`
-					<li id="${id}" class="list-group-item mb-3 taskItem">${title}
+					<li id="${id}" class="list-group-item mb-3 taskItem ${category}">${title}
 						<div class="btn-group float-right">
 							<button id="${id}" class="btn btn-secondary doneTask">Done</button>
 							<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
@@ -261,13 +265,45 @@ function fetchList(itemKey) {
 }
 
 function doneTask(clickedTask, element) {
-	//get current taskList
-//	let currentTasksList = JSON.parse(localStorage.getItem())
 	//check if task id is euqal to id of clicked done button
 	//and cross text which is inside <li> tag
 	let buttonId = element.getAttribute('id'),
 			clickedTaskId = clickedTask.getAttribute('id'),
 			doneElement = document.getElementById(clickedTaskId);
+	
+	//check if clickedTask belongs to HomeTask category
+	if(clickedTask.classList.contains('HomeTask')) {
+		//get object form localstorage
+		let tasksArr = JSON.parse(localStorage.getItem('homeTasks'));
+		
+		//set isDone property to true
+		for(let i = 0; i < tasksArr.length; i++) {
+			tasksArr[i].isTaskDone = true;	
+		}
+		localStorage.setItem('homeTasks', JSON.stringify(tasksArr));
+	}
+	//check if clickedTask belongs to WorkTask catogory
+	if(clickedTask.classList.contains('WorkTask')) {
+		//get object form localstorage
+		let tasksArr = JSON.parse(localStorage.getItem('workTasks'));
+		
+		//set isDone property to true
+		for(let i = 0; i < tasksArr.length; i++) {
+			tasksArr[i].isTaskDone = true;	
+		}
+		localStorage.setItem('workTasks', JSON.stringify(tasksArr));
+	}
+	//check if clicked belongs to WorkTask category
+	if(clickedTask.classList.contains('WorkTask')) {
+		//get object form localstorage
+		let tasksArr = JSON.parse(localStorage.getItem('otherTasks'));
+		
+		//set isDone property to true
+		for(let i = 0; i < tasksArr.length; i++) {
+			tasksArr[i].isTaskDone = true;	
+		}
+		localStorage.setItem('otherTasks', JSON.stringify(tasksArr));
+	}
 	
 	console.log('Inside doneTask: clickedTaskID',clickedTaskId,'clickedButtonID', buttonId);
 	if(buttonId === clickedTaskId) {
