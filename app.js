@@ -1,7 +1,12 @@
-//create event listener for submiting a form
-document.getElementById('createTaskForm').addEventListener('submit', saveTask);
+/* TO-DO APP 
+** Author: Adam Klepacz
+** Playground app in plain JS
+** 2017
+*/
 
-//create event listeneres for "check task" section
+document.getElementById('creationTaskForm').addEventListener('submit', saveTask);
+
+//event listeneres for "check task" section
 document.getElementById('showHomeTasks').addEventListener('click', function(){
     fetchList('homeTasks');
 }, true);
@@ -12,48 +17,58 @@ document.getElementById('showOtherTasks').addEventListener('click', function(){
 	fetchList('otherTasks');
 }, true);
 
-//crete event listener for document
-document.addEventListener('click', handleEvent, true);
+//event listeners to handle multiple "delete" and "done" buttons
+document.addEventListener('click', handleTaskDone, true);
+document.addEventListener('click', handleTaskDelete, true);
 
-//hide taskArea at the very begining
+//hide taskArea element at the very beginning
 document.getElementById('taskArea').style.display = "none";
 
+//unique id for task
 function makeId() {
-  var text = "";
-  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let text = "";
+  let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-  for (var i = 0; i < 5; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
+  for (var i = 0; i < 5; i++) {
+		text += possible.charAt(Math.floor(Math.random() * possible.length));
 		text += Math.floor(Math.random() * 99999);
+	}
 	console.log(text);
   return text;
 }
 
-//handle event for multiple done and delete buttons
-function handleEvent(e) {
+function handleTaskDelete(e) {
 	//event for IE
 	e = event || window.event;
 	e.target = e.target || e.srcElement;
 	
-	//get clicked <button>
-	let clickedButton = e.target;
+	let clickedButton = e.target,
+			clickedTask = e.target.closest('li.taskItem');
 	
-	//get clicked task <li>
-	let clickedTask = e.target.closest('li.taskItem');
-	
-	//Climb up the document tree from the target of event
+	//Climb up the document tree, check if clickedButton is a <button> and 
+	//does it have deleteTask class
 	while(clickedButton) {
-		if(clickedButton.nodeName === "BUTTON" && /doneTask/.test(clickedButton.className)) {
-			//user click on a <button> or on an element inside a <button>
-			//with class of ".doneTask"
-			doneTask(clickedTask, clickedButton);
+		if(clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
+			deleteTask(clickedTask, clickedButton);
 			break;
 		}
-		if(clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
-			//user click on a <button> or on an element inside a <button>
-			//with class of ".deleteTask"
-			//deleteTask(element);
-			console.log(clickedButton,'execute deleteTask function');
+		clickedButton = clickedButton.parentNode;
+	}
+}
+
+function handleTaskDone(e) {
+	//event for IE
+	e = event || window.event;
+	e.target = e.target || e.srcElement;
+	
+	let clickedButton = e.target,
+			clickedTask = e.target.closest('li.taskItem');
+	
+	//Climb up the document tree, check if clickedButton is a <button> and
+	//does it have doneTask class
+	while(clickedButton) {
+		if(clickedButton.nodeName === "BUTTON" && /doneTask/.test(clickedButton.className)) {
+			doneTask(clickedTask, clickedButton);
 			break;
 		}
 		clickedButton = clickedButton.parentNode;
@@ -61,31 +76,20 @@ function handleEvent(e) {
 }
 
 function saveTask(e) {
-	//prevent form from submitting
-	e.preventDefault();
+	e.preventDefault(); //prevent page reload
 	
-	//display taskArea
 	document.getElementById('taskArea').style.display = "block";
 	
-	//get task title, priority and category
 	let taskTitle = document.getElementById('taskTitle').value,
 			taskPriority = document.getElementById('taskPriority').value,
-			taskCategory = document.getElementById('taskCategory').value,
-			itemKey = '',
+			taskCategory = document.getElementById('taskCategory').value += "Tasks",
 			taskId = makeId(),
-			isTaskDone = false;
-			console.log(taskId);
+			isTaskDone = false, //on the very beginning newTask is always NOT DONE(false)
 			
-	//get form
-			myForm = document.getElementById('createTaskForm');
+			creationTaskForm = document.getElementById('creationTaskForm'),
 	
-	//init empty object for storing a task
-	let newTask = {};
+			newTask = {};	//init empty object for storing new task
 	
-	//add task postfix to category
-	taskCategory += "Task";
-	
-	//set title, priority and category to newTask object
 	newTask = {
 		title: taskTitle,
 		priority: taskPriority,
@@ -93,177 +97,122 @@ function saveTask(e) {
 		id: taskId,
 		isTaskDone: isTaskDone //boolean
 	};
+		
 	
-	//check category of newTask
-	if(newTask.category === "HomeTask") {
-		itemKey = 'homeTasks';
-	} else if(newTask.category === "WorkTask") {
-		itemKey = 'workTasks';
-	} else if(newTask.category === "OtherTask") {
-		itemKey = 'otherTasks';
-	}
-	
-	console.log('itemKey: ', itemKey);
-	
-	//initialize empty arrays to store tasks 
 	let homeTasksArr = [],
 			workTaskArr = [],
 			otherTaskArr = [];
 	
 	
-	//If in localstorage there is NO item like
-	//homeTasks or
-	//workTasks or
-	//otherTasks
-	if(localStorage.getItem(itemKey) === null) {
-		//check if new task category is identical to "Home"
-		//and init homeTaskArr to store home tasks data
-		if(newTask.category === "HomeTask") {
-			//init home task array
+	//if localStorage is empty
+	if(localStorage.getItem(taskCategory) === null) {
+		if(newTask.category === "homeTasks") {
 			homeTasksArr = [];
-			
-			//push newTask to home task array
 			homeTasksArr.push(newTask)
 			
-			//convert homeTaskArr(array) to string and set it up to localstorage
-			//using JSON data format
+			//convert homeTaskArr(array) to string and set it up to localStorage
 			localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
-			console.log('Operation save new HOME TASK succeed!');
 		}
-		//check if new task category is idetical to "Work"
-		//and init workTaskArr to store work tasks data
-		if(newTask.category === "WorkTask") {
-			//init work task array
+		if(newTask.category === "workTasks") {
 			workTaskArr = [];
-			
-			//push newTask to home task array
 			workTaskArr.push(newTask);
 			
 			//convert workTaskArr to string and set it up to localstorage
-			//using JSON data format
 			localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
-			console.log('Operation: save new WORK TASK succeed!');
 		}
-		//check if new task category is identical to "Other"
-		//and init otherTaskArr to store other tasks data
-		if(newTask.category === "OtherTask") {
-			//init other task array
+		if(newTask.category === "otherTasks") {
 			otherTaskArr = [];
-			
-			//push newTask to home task array
 			otherTaskArr.push(newTask);
 			
 			//convert otherTaskArr to string and set it up to localstorage
-			//using JSON data format
 			localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
-			console.log('Operation: save new OTHER TASK succeed!');
 		}
-		//Else if there is something in localstorage
-	} else { 
-		//check if new task category is identical to "Home"
-		//and parse JSON data to array
-		//cause we need array format to push newTask there
-		if(newTask.category === "HomeTask") {
-			//parse string stored in localstorage to array/convert string to an array
+	} else { //if there is something in localStorage 
+		if(newTask.category === "homeTasks") {
+			//parse string stored in localstorage to array
 			homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
-			
-			//push new task to home task array
-			homeTasksArr.push(newTask);
+			homeTasksArr.push(newTask); //push new task
 			
 			//re-set it up to local storage
 			localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
-			console.log("There was homeTasks before. New task added");
 		}
-		//check if new task category is idetical to "Work"
-		//and parse JSON data to array
-		//cause we need array format to push newTask there
-		if(newTask.category === "WorkTask") {
-			//parse string stored in localstorage to array/convert string to an array
+		if(newTask.category === "workTasks") {
+			//parse string stored in localstorage to array
 			workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
-			
-			//push new task to work task array
-			workTaskArr.push(newTask);
+			workTaskArr.push(newTask); //push new task
 			
 			//re-set it up to local storage
 			localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
-			console.log("There was workTasks before. New task added");
 		}
-		//check if new task category is idetical to "Other"
-		//and parse JSON data to array
-		//cause we need array format to push newTask there
-		if(newTask.category === "OtherTask") {
-			//parse string stored in localstorage to array/convert string to an array
+		if(newTask.category === "otherTasks") {
+			//parse string stored in localstorage to array
 			otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
-			
-			//push new task to other task array/ add new task
-			otherTaskArr.push(newTask);
+			otherTaskArr.push(newTask); //push new task
 			
 			//re-set it up to local storage
 			localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
-			console.log("There was otherTasks before. New task added");
 		}
-	} // end of else
+	} 
+	creationTaskForm.reset();
 	
-	//reset form after submiting
-	myForm.reset();
-	
-	//fetch list
-	fetchList(itemKey);
+	fetchList(taskCategory);
 }
 
-//fetch list using itemKey form localstorage
-function fetchList(itemKey) {
-	//display taskArea
-	document.getElementById('taskArea').style.display = "block";
+//fetch list using itemKeyCategory form localstorage
+function fetchList(taskCategory) {
+	let tasksArr = JSON.parse(localStorage.getItem(taskCategory)),
 	
-	//get taskArr from localstorage
-	let tasksArr = JSON.parse(localStorage.getItem(itemKey)),
-	
-	//get task output element
-			resultCategory = document.getElementById('taskCategoryInner'),
-			result = document.getElementById('taskOutput'),
+	//get outputs for category and result(task list)
+			resultCategory = document.getElementById('taskCategoryOutput'),
+			result = document.getElementById('taskOutput');
 			
-			
-	//Result category inner html
-			resultCategoryInnerHtml = tasksArr[0].category;
-	
-	//init empty "place" for results
-	resultCategory.innerHTML = resultCategoryInnerHtml;
 	result.innerHTML = '';
 	
-	//loop over taskArr elements 
-	for(let i = 0; i < tasksArr.length; i++) {
-		let title = tasksArr[i].title,
-				priority = tasksArr[i].priority,
-				category = tasksArr[i].category,
-				id = tasksArr[i].id,
-				isDone = tasksArr[i].isTaskDone;
-		console.log('task is done', isDone);
-
-		result.innerHTML +=
-				`
-					<li id="${id}" class="list-group-item mb-3 taskItem ${category}">${title}
-						<div class="btn-group float-right">
-							<button id="${id}" class="btn btn-secondary doneTask">Done</button>
-							<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
-						</div>
-					</li>
-				`;
+	if(tasksArr) {
+		//display taskArea
+		document.getElementById('taskArea').style.display = "block";
 		
-		//get currentTask
-		let currentTask = document.getElementById(id);
-		console.log('CurrentTask:', currentTask);
+		resultCategory.innerHTML = taskCategory;
 		
-		//check if task is done
-		if(isDone) {
-			currentTask.style.textDecoration = "line-through";
-		} else {
-			currentTask.style.textDecoration = "none";	
+		for(let i = 0; i < tasksArr.length; i++) {
+			let title = tasksArr[i].title,
+					priority = tasksArr[i].priority, //will be used later to colorize task background
+					category = tasksArr[i].category,
+					id = tasksArr[i].id,
+					isDone = tasksArr[i].isTaskDone;
+		 
+			/* TO-DO
+			** colorize task background
+			** color based on task priority
+			*/
+			result.innerHTML +=
+					`
+						<li id="${id}" class="list-group-item mb-3 taskItem ${category}">${title}
+							<div class="btn-group float-right">
+								<button id="${id}" class="btn btn-secondary doneTask">Done</button>
+								<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
+							</div>
+						</li>
+					`;
+			crossThroughTask(id, isDone);
 		}
 	}
-	console.log("END OF FETCH FUNCTION");
 }
 
+function crossThroughTask(id, isDone) {
+	let currentTask = document.getElementById(id);
+	
+	if(isDone) {
+		currentTask.style.textDecoration = "line-through";
+	} else {
+		currentTask.style.textDecoration = "none";	
+	}
+}
+
+/* TODO
+** Naprawić funkcje żeby przekreślała tylko kliknięty task a nie 
+** wszystkie na liście
+*/
 function doneTask(clickedTask, element) {
 	//check if task id is euqal to id of clicked done button
 	//and cross text which is inside <li> tag
@@ -272,18 +221,18 @@ function doneTask(clickedTask, element) {
 			doneElement = document.getElementById(clickedTaskId);
 	
 	//check if clickedTask belongs to HomeTask category
-	if(clickedTask.classList.contains('HomeTask')) {
+	if(clickedTask.classList.contains('homeTasks')) {
 		//get object form localstorage
 		let tasksArr = JSON.parse(localStorage.getItem('homeTasks'));
 		
 		//set isDone property to true
 		for(let i = 0; i < tasksArr.length; i++) {
-			tasksArr[i].isTaskDone = true;	
+			tasksArr[i].isTaskDone = true;	   //tu jest zasadniczy błąd bo idzie pętlą i we wszystkich elementach ustawia 																					//isTaskDone na true
 		}
 		localStorage.setItem('homeTasks', JSON.stringify(tasksArr));
 	}
 	//check if clickedTask belongs to WorkTask catogory
-	if(clickedTask.classList.contains('WorkTask')) {
+	if(clickedTask.classList.contains('workTasks')) {
 		//get object form localstorage
 		let tasksArr = JSON.parse(localStorage.getItem('workTasks'));
 		
@@ -294,7 +243,7 @@ function doneTask(clickedTask, element) {
 		localStorage.setItem('workTasks', JSON.stringify(tasksArr));
 	}
 	//check if clicked belongs to WorkTask category
-	if(clickedTask.classList.contains('WorkTask')) {
+	if(clickedTask.classList.contains('otherTasks')) {
 		//get object form localstorage
 		let tasksArr = JSON.parse(localStorage.getItem('otherTasks'));
 		

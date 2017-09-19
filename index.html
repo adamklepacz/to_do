@@ -18,7 +18,7 @@
 						<h2 class="display-6">To do list</h2>
 					</div>
 					<div class="card-body">
-						<form id="createTaskForm">
+						<form id="creationTaskForm">
 							<input id="taskTitle" class="form-control mb-2" type="text" placeholder="Type new task here..." required>
 							<select id="taskPriority" class="form-control mb-2" name="Priority" required>
 								<option value="">Task priority</option>
@@ -28,9 +28,9 @@
 							</select>
 							<select id="taskCategory" class="form-control mb-2" name="Task category" required>
 								<option value="">Pick category</option>
-								<option value="Home">Home</option>
-								<option value="Work">Work</option>
-								<option value="Other">Other</option>
+								<option value="home">home</option>
+								<option value="work">work</option>
+								<option value="other">other</option>
 							</select>
 							<button class="btn btn-success align-self-center" type="submit">ADD</button>
 						</form>
@@ -58,7 +58,7 @@
 		<div class="row justify-content-center">
 			<div class="col-sm-6 col-9">
 				<div class="card mt-3 mb-3" id="taskArea">
-					<div class="card-header bg-secondary"><span class="text-light" id="taskCategoryInner"></span>
+					<div class="card-header bg-secondary"><span class="text-light" id="taskCategoryOutput"></span>
 					</div>
 					<div class="card-body">
 						<ul class="list-group" id="taskOutput">
