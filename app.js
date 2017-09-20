@@ -270,6 +270,11 @@ function doneTask(clickedTask, clickedButton) {
 	fetchList(taskCategory);
 }
 
+function 	deleteTask(clickedTask, clickedButton) {
+
+
+}
+
 	//small validation, do not store data in object when there is empty string in taskTitle
 	/* TO-DO */
 	//create validation function
