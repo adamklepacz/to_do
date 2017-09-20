@@ -8,7 +8,7 @@ document.getElementById('creationTaskForm').addEventListener('submit', saveTask)
 
 //event listeneres for "check task" section
 document.getElementById('showHomeTasks').addEventListener('click', function(){
-    fetchList('homeTasks');
+	fetchList('homeTasks');
 }, true);
 document.getElementById('showWorkTasks').addEventListener('click', function(){
 	fetchList('workTasks');
@@ -33,7 +33,6 @@ function makeId() {
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
 		text += Math.floor(Math.random() * 99999);
 	}
-	console.log(text);
   return text;
 }
 
@@ -179,7 +178,17 @@ function fetchList(taskCategory) {
 					priority = tasksArr[i].priority, //will be used later to colorize task background
 					category = tasksArr[i].category,
 					id = tasksArr[i].id,
-					isDone = tasksArr[i].isTaskDone;
+					isDone = tasksArr[i].isTaskDone,
+					
+					taskBorder;  //task border
+					
+		
+			//check priority and set border color
+			if(priority === "High") taskBorder = 'border border-danger';
+			if(priority === "Medium") taskBorder = 'border border-warning';
+			if(priority === "Low") taskBorder = 'border border-info';
+			
+			
 		 
 			/* TO-DO
 			** colorize task background
@@ -187,7 +196,7 @@ function fetchList(taskCategory) {
 			*/
 			result.innerHTML +=
 					`
-						<li id="${id}" class="list-group-item mb-3 taskItem ${category}">${title}
+						<li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
 							<div class="btn-group float-right">
 								<button id="${id}" class="btn btn-secondary doneTask">Done</button>
 								<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
@@ -200,7 +209,8 @@ function fetchList(taskCategory) {
 }
 
 function crossThroughTask(id, isDone) {
-	let currentTask = document.getElementById(id);
+	let currentTask = document.getElementById(id),
+			taskCategory;
 	
 	if(isDone) {
 		currentTask.style.textDecoration = "line-through";
@@ -209,59 +219,56 @@ function crossThroughTask(id, isDone) {
 	}
 }
 
-/* TODO
-** Naprawić funkcje żeby przekreślała tylko kliknięty task a nie 
-** wszystkie na liście
-*/
-function doneTask(clickedTask, element) {
-	//check if task id is euqal to id of clicked done button
-	//and cross text which is inside <li> tag
-	let buttonId = element.getAttribute('id'),
+function doneTask(clickedTask, clickedButton) {
+	let buttonId = clickedButton.getAttribute('id'),
 			clickedTaskId = clickedTask.getAttribute('id'),
-			doneElement = document.getElementById(clickedTaskId);
+			isDone; //boolean
 	
-	//check if clickedTask belongs to HomeTask category
+			taskArr = [];
+	
 	if(clickedTask.classList.contains('homeTasks')) {
-		//get object form localstorage
-		let tasksArr = JSON.parse(localStorage.getItem('homeTasks'));
+		taskArr = JSON.parse(localStorage.getItem('homeTasks'));
+		taskCategory = 'homeTasks';
 		
-		//set isDone property to true
-		for(let i = 0; i < tasksArr.length; i++) {
-			tasksArr[i].isTaskDone = true;	   //tu jest zasadniczy błąd bo idzie pętlą i we wszystkich elementach ustawia 																					//isTaskDone na true
+		for(let i = 0; i < taskArr.length; i++) {
+			if(taskArr[i].id === clickedTaskId) {
+				isDone =	taskArr[i].isTaskDone = true;
+				
+				localStorage.setItem('homeTasks', JSON.stringify(taskArr));
+				crossThroughTask(clickedTaskId, isDone);
+			}
 		}
-		localStorage.setItem('homeTasks', JSON.stringify(tasksArr));
-	}
-	//check if clickedTask belongs to WorkTask catogory
-	if(clickedTask.classList.contains('workTasks')) {
-		//get object form localstorage
-		let tasksArr = JSON.parse(localStorage.getItem('workTasks'));
-		
-		//set isDone property to true
-		for(let i = 0; i < tasksArr.length; i++) {
-			tasksArr[i].isTaskDone = true;	
-		}
-		localStorage.setItem('workTasks', JSON.stringify(tasksArr));
-	}
-	//check if clicked belongs to WorkTask category
-	if(clickedTask.classList.contains('otherTasks')) {
-		//get object form localstorage
-		let tasksArr = JSON.parse(localStorage.getItem('otherTasks'));
-		
-		//set isDone property to true
-		for(let i = 0; i < tasksArr.length; i++) {
-			tasksArr[i].isTaskDone = true;	
-		}
-		localStorage.setItem('otherTasks', JSON.stringify(tasksArr));
 	}
 	
-	console.log('Inside doneTask: clickedTaskID',clickedTaskId,'clickedButtonID', buttonId);
-	if(buttonId === clickedTaskId) {
-		doneElement.style.textDecoration = "line-through";
-	} else {
-		//console.log('Handle other possibility...');
+	if(clickedTask.classList.contains('workTasks')) {
+		taskArr = JSON.parse(localStorage.getItem('workTasks'));
+		taskCategory = 'workTasks';
+		
+		for(let i = 0; i < taskArr.length; i++) {
+			if(taskArr[i].id === clickedTaskId) {
+				isDone = taskArr[i].isTaskDone = true;
+				
+				localStorage.setItem('workTasks', JSON.stringify(taskArr));
+				crossThroughTask(clickedTaskId, isDone);
+			}
+		}
 	}
+	
+	if(clickedTask.classList.contains('otherTasks')) {
+		taskArr = JSON.parse(localStorage.getItem('otherTasks'));
+		taskCategory = 'otherTasks';
+		
+		for(let i = 0; i < taskArr.length; i++) {
+			if(taskArr[i].id === clickedTaskId) {
+				isDone = taskArr[i].isTaskDone = true;
+				
+				localStorage.setItem('otherTasks', JSON.stringify(taskArr));
+				crossThroughTask(clickedTaskId, isDone);
+			}
+		}
+	}
+	fetchList(taskCategory);
 }
-
 
 	//small validation, do not store data in object when there is empty string in taskTitle
 	/* TO-DO */
