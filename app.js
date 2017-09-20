@@ -165,13 +165,12 @@ function fetchList(taskCategory) {
 			resultCategory = document.getElementById('taskCategoryOutput'),
 			result = document.getElementById('taskOutput');
 			
-	result.innerHTML = '';
-	
 	if(tasksArr) {
+		result.innerHTML = '';
+		resultCategory.innerHTML = taskCategory;
+		
 		//display taskArea
 		document.getElementById('taskArea').style.display = "block";
-		
-		resultCategory.innerHTML = taskCategory;
 		
 		for(let i = 0; i < tasksArr.length; i++) {
 			let title = tasksArr[i].title,
@@ -205,6 +204,9 @@ function fetchList(taskCategory) {
 					`;
 			crossThroughTask(id, isDone);
 		}
+	} else {
+		//hide taskArea
+		document.getElementById('taskArea').style.display = "none";
 	}
 }
 
@@ -222,9 +224,10 @@ function crossThroughTask(id, isDone) {
 function doneTask(clickedTask, clickedButton) {
 	let buttonId = clickedButton.getAttribute('id'),
 			clickedTaskId = clickedTask.getAttribute('id'),
-			isDone; //boolean
+			isDone, //boolean
 	
-			taskArr = [];
+			taskArr = [],
+			taskCategory = "";
 	
 	if(clickedTask.classList.contains('homeTasks')) {
 		taskArr = JSON.parse(localStorage.getItem('homeTasks'));
@@ -270,9 +273,57 @@ function doneTask(clickedTask, clickedButton) {
 	fetchList(taskCategory);
 }
 
-function 	deleteTask(clickedTask, clickedButton) {
-
-
+/* TO-DO
+** Remove empty object from 
+** localStorage when taskArr is empty
+*/
+function	deleteTask(clickedTask, clickedButton) {
+	let buttonId = clickedButton.getAttribute('id'),
+			clickedTaskId = clickedTask.getAttribute('id'),
+			
+			taskArr = [],
+			taskCategory = "";
+	
+	clickedTask.classList.add("bg-danger");
+	
+	setTimeout(function() {
+			if(clickedTask.classList.contains('homeTasks')) {
+		taskArr = JSON.parse(localStorage.getItem('homeTasks'));
+		taskCategory = 'homeTasks';
+		
+		for(let i = 0; i < taskArr.length; i++) {
+			if(taskArr[i].id === clickedTaskId) {
+				taskArr.splice(taskArr[i], 1); //remove matched element
+				localStorage.setItem('homeTasks', JSON.stringify(taskArr));
+			}
+		}
+	}
+	
+	if(clickedTask.classList.contains('workTasks')) {
+		taskArr = JSON.parse(localStorage.getItem('workTasks'));
+		taskCategory = 'workTasks';
+		
+		for(let i = 0; i < taskArr.length; i++) {
+			if(taskArr[i].id === clickedTaskId) {
+				taskArr.splice(taskArr[i], 1); //remove matched element
+				localStorage.setItem('workTasks', JSON.stringify(taskArr));
+			}
+		}
+	}
+	
+	if(clickedTask.classList.contains('otherTasks')) {
+		taskArr = JSON.parse(localStorage.getItem('otherTasks'));
+		taskCategory = 'otherTasks';
+		
+		for(let i = 0; i < taskArr.length; i++) {
+			if(taskArr[i].id === clickedTaskId) {
+				taskArr.splice(taskArr[i], 1); //remove matched element
+				localStorage.setItem('otherTasks', JSON.stringify(taskArr));
+			}
+		}
+	}
+	fetchList(taskCategory);
+	}, 500);
 }
 
 	//small validation, do not store data in object when there is empty string in taskTitle
