@@ -24,6 +24,8 @@ document.addEventListener('click', handleTaskDelete, true);
 //hide taskArea element at the very beginning
 document.getElementById('taskArea').style.display = "none";
 
+fetchTaskCount();
+
 //unique id for task
 function makeId() {
   let text = "";
@@ -160,8 +162,7 @@ function saveTask(e) {
 		return;
 	}
 	creationTaskForm.reset();
-	
-	
+	fetchTaskCount();
 }
 
 //fetch list using itemKeyCategory form localstorage
@@ -324,6 +325,7 @@ function	deleteTask(clickedTask, clickedButton) {
 	}
 	cleanLocalStorage(taskCategory);
 	fetchList(taskCategory);
+	fetchTaskCount();
 	}, 500);
 }
 
@@ -340,7 +342,28 @@ function avoidSpacedString() {
 	let taskTitle = document.getElementById('taskTitle').value;
 	
 	if (!taskTitle.replace(/\s/g, '').length) {
+		alert('Empty spaces? Nope.');
     return false;
 	}
 	return true;
+}
+
+function fetchTaskCount() {
+	//count home tasks
+	let homeTaskArr = JSON.parse(localStorage.getItem('homeTasks')) || [],
+			workTaskArr = JSON.parse(localStorage.getItem('workTasks')) || [],
+			otherTasksArr = JSON.parse(localStorage.getItem('otherTasks')) || [],
+			
+			homeTaskCount = homeTaskArr.length,
+			workTaskCount = workTaskArr.length,
+			otherTaskCount = otherTasksArr.length;
+	
+	//fetch badges
+	let homeTaskCounter = document.getElementById('homeTaskCounter'),
+			workTaskCounter = document.getElementById('workTaskCounter'),
+			otherTaskCounter = document.getElementById('otherTaskCounter');
+	
+	homeTaskCounter.innerHTML = homeTaskCount;
+	workTaskCounter.innerHTML = workTaskCount;
+	otherTaskCounter.innerHTML = otherTaskCount;
 }

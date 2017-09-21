@@ -19,7 +19,7 @@
 					</div>
 					<div class="card-body">
 						<form id="creationTaskForm">
-							<input id="taskTitle" class="form-control mb-2" type="text" placeholder="Type new task here...">
+							<input id="taskTitle" class="form-control mb-2" type="text" placeholder="Type new task here..." required>
 							<select id="taskPriority" class="form-control mb-2" name="Priority" required>
 								<option value="">Task priority</option>
 								<option value="High">High</option>
@@ -42,13 +42,13 @@
 									<p style="margin-bottom: 0" class="">Task Category</p>
 								</span>
 								<span class="input-group-btn">
-									<button id="showHomeTasks" class="btn btn-secondary">Home</button>
+									<button id="showHomeTasks" class="btn btn-secondary">Home&nbsp;<span id="homeTaskCounter" class="badge badge-secondary"></span></button>
 								</span>
 								<span class="input-group-btn">
-									<button id="showWorkTasks" class="btn btn-info">Work</button>
+									<button id="showWorkTasks" class="btn btn-info">Work&nbsp;<span id="workTaskCounter" class="badge badge-secondary"></span></button>
 								</span>
 								<span class="input-group-btn">
-									<button id="showOtherTasks" class="btn btn-warning text-dark">Other</button>
+									<button id="showOtherTasks" class="btn btn-warning text-dark">Other&nbsp;<span id="otherTaskCounter" class="badge badge-secondary"></span></button>
 								</span>
 							</div>
 					</div>
