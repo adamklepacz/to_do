@@ -6,13 +6,13 @@
 document.getElementById('creationTaskForm').addEventListener('submit', saveTask);
 
 //event listeneres for "check task" section
-document.getElementById('showHomeTasks').addEventListener('click', function() {
+document.getElementById('showHomeTasks').addEventListener('click', function () {
 	fetchList('homeTasks');
 }, true);
-document.getElementById('showWorkTasks').addEventListener('click', function() {
+document.getElementById('showWorkTasks').addEventListener('click', function () {
 	fetchList('workTasks');
 }, true);
-document.getElementById('showOtherTasks').addEventListener('click', function() {
+document.getElementById('showOtherTasks').addEventListener('click', function () {
 	fetchList('otherTasks');
 }, true);
 
@@ -30,7 +30,7 @@ function makeId() {
 	let text = "";
 	let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
-	for(var i = 0; i < 5; i++) {
+	for (var i = 0; i < 5; i++) {
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
 		text += Math.floor(Math.random() * 99999);
 	}
@@ -47,8 +47,8 @@ function handleTaskDelete(e) {
 
 	//Climb up the document tree, check if clickedButton is a <button> and 
 	//does it have deleteTask class
-	while(clickedButton) {
-		if(clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
+	while (clickedButton) {
+		if (clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
 			deleteTask(clickedTask, clickedButton);
 			break;
 		}
@@ -66,8 +66,8 @@ function handleTaskDone(e) {
 
 	//Climb up the document tree, check if clickedButton is a <button> and
 	//does it have doneTask class
-	while(clickedButton) {
-		if(clickedButton.nodeName === "BUTTON" && /doneTask/.test(clickedButton.className)) {
+	while (clickedButton) {
+		if (clickedButton.nodeName === "BUTTON" && /doneTask/.test(clickedButton.className)) {
 			doneTask(clickedTask, clickedButton);
 			break;
 		}
@@ -78,7 +78,7 @@ function handleTaskDone(e) {
 function saveTask(e) {
 	e.preventDefault(); //prevent page reload
 
-	if(avoidSpacedString()) {
+	if (avoidSpacedString()) {
 		document.getElementById('taskArea').style.display = "block";
 
 		let taskTitle = document.getElementById('taskTitle').value,
@@ -104,22 +104,22 @@ function saveTask(e) {
 			otherTaskArr = [];
 
 		//if localStorage is empty
-		if(localStorage.getItem(taskCategory) === null) {
-			if(newTask.category === "homeTasks") {
+		if (localStorage.getItem(taskCategory) === null) {
+			if (newTask.category === "homeTasks") {
 				homeTasksArr = [];
 				homeTasksArr.push(newTask)
 
 				//convert homeTaskArr(array) to string and set it up to localStorage
 				localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
 			}
-			if(newTask.category === "workTasks") {
+			if (newTask.category === "workTasks") {
 				workTaskArr = [];
 				workTaskArr.push(newTask);
 
 				//convert workTaskArr to string and set it up to localstorage
 				localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
 			}
-			if(newTask.category === "otherTasks") {
+			if (newTask.category === "otherTasks") {
 				otherTaskArr = [];
 				otherTaskArr.push(newTask);
 
@@ -127,7 +127,7 @@ function saveTask(e) {
 				localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
 			}
 		} else { //if there is something in localStorage 
-			if(newTask.category === "homeTasks") {
+			if (newTask.category === "homeTasks") {
 				//parse string stored in localstorage to array
 				homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
 				homeTasksArr.push(newTask); //push new task
@@ -135,7 +135,7 @@ function saveTask(e) {
 				//re-set it up to local storage
 				localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
 			}
-			if(newTask.category === "workTasks") {
+			if (newTask.category === "workTasks") {
 				//parse string stored in localstorage to array
 				workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
 				workTaskArr.push(newTask); //push new task
@@ -143,7 +143,7 @@ function saveTask(e) {
 				//re-set it up to local storage
 				localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
 			}
-			if(newTask.category === "otherTasks") {
+			if (newTask.category === "otherTasks") {
 				//parse string stored in localstorage to array
 				otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
 				otherTaskArr.push(newTask); //push new task
@@ -170,14 +170,14 @@ function fetchList(taskCategory) {
 		resultCategory = document.getElementById('taskCategoryOutput'),
 		result = document.getElementById('taskOutput');
 
-	if(tasksArr) {
+	if (tasksArr) {
 		result.innerHTML = '';
 		resultCategory.innerHTML = taskCategory;
 
 		//display taskArea
 		document.getElementById('taskArea').style.display = "block";
 
-		for(let i = 0; i < tasksArr.length; i++) {
+		for (let i = 0; i < tasksArr.length; i++) {
 			let title = tasksArr[i].title,
 				priority = tasksArr[i].priority,
 				category = tasksArr[i].category,
@@ -187,9 +187,9 @@ function fetchList(taskCategory) {
 				taskBorder; //task border
 
 			//check priority and set border color
-			if(priority === "High") taskBorder = 'border border-danger';
-			if(priority === "Medium") taskBorder = 'border border-warning';
-			if(priority === "Low") taskBorder = 'border border-info';
+			if (priority === "High") taskBorder = 'border border-danger';
+			if (priority === "Medium") taskBorder = 'border border-warning';
+			if (priority === "Low") taskBorder = 'border border-info';
 
 			result.innerHTML +=
 				`
@@ -212,7 +212,7 @@ function crossThroughTask(id, isDone) {
 	let currentTask = document.getElementById(id),
 		taskCategory;
 
-	if(isDone) {
+	if (isDone) {
 		currentTask.style.textDecoration = "line-through";
 	} else {
 		currentTask.style.textDecoration = "none";
@@ -227,12 +227,12 @@ function doneTask(clickedTask, clickedButton) {
 		taskArr = [],
 		taskCategory = "";
 
-	if(clickedTask.classList.contains('homeTasks')) {
+	if (clickedTask.classList.contains('homeTasks')) {
 		taskArr = JSON.parse(localStorage.getItem('homeTasks'));
 		taskCategory = 'homeTasks';
 
-		for(let i = 0; i < taskArr.length; i++) {
-			if(taskArr[i].id === clickedTaskId) {
+		for (let i = 0; i < taskArr.length; i++) {
+			if (taskArr[i].id === clickedTaskId) {
 				isDone = taskArr[i].isTaskDone = true;
 
 				localStorage.setItem('homeTasks', JSON.stringify(taskArr));
@@ -241,12 +241,12 @@ function doneTask(clickedTask, clickedButton) {
 		}
 	}
 
-	if(clickedTask.classList.contains('workTasks')) {
+	if (clickedTask.classList.contains('workTasks')) {
 		taskArr = JSON.parse(localStorage.getItem('workTasks'));
 		taskCategory = 'workTasks';
 
-		for(let i = 0; i < taskArr.length; i++) {
-			if(taskArr[i].id === clickedTaskId) {
+		for (let i = 0; i < taskArr.length; i++) {
+			if (taskArr[i].id === clickedTaskId) {
 				isDone = taskArr[i].isTaskDone = true;
 
 				localStorage.setItem('workTasks', JSON.stringify(taskArr));
@@ -255,12 +255,12 @@ function doneTask(clickedTask, clickedButton) {
 		}
 	}
 
-	if(clickedTask.classList.contains('otherTasks')) {
+	if (clickedTask.classList.contains('otherTasks')) {
 		taskArr = JSON.parse(localStorage.getItem('otherTasks'));
 		taskCategory = 'otherTasks';
 
-		for(let i = 0; i < taskArr.length; i++) {
-			if(taskArr[i].id === clickedTaskId) {
+		for (let i = 0; i < taskArr.length; i++) {
+			if (taskArr[i].id === clickedTaskId) {
 				isDone = taskArr[i].isTaskDone = true;
 
 				localStorage.setItem('otherTasks', JSON.stringify(taskArr));
@@ -280,37 +280,37 @@ function deleteTask(clickedTask, clickedButton) {
 
 	clickedTask.classList.add("bg-danger");
 
-	setTimeout(function() {
-		if(clickedTask.classList.contains('homeTasks')) {
+	setTimeout(function () {
+		if (clickedTask.classList.contains('homeTasks')) {
 			taskArr = JSON.parse(localStorage.getItem('homeTasks'));
 			taskCategory = 'homeTasks';
 
-			for(let i = 0; i < taskArr.length; i++) {
-				if(taskArr[i].id === clickedTaskId) {
+			for (let i = 0; i < taskArr.length; i++) {
+				if (taskArr[i].id === clickedTaskId) {
 					taskArr.splice(taskArr[i], 1); //remove matched element
 					localStorage.setItem('homeTasks', JSON.stringify(taskArr));
 				}
 			}
 		}
 
-		if(clickedTask.classList.contains('workTasks')) {
+		if (clickedTask.classList.contains('workTasks')) {
 			taskArr = JSON.parse(localStorage.getItem('workTasks'));
 			taskCategory = 'workTasks';
 
-			for(let i = 0; i < taskArr.length; i++) {
-				if(taskArr[i].id === clickedTaskId) {
+			for (let i = 0; i < taskArr.length; i++) {
+				if (taskArr[i].id === clickedTaskId) {
 					taskArr.splice(taskArr[i], 1); //remove matched element
 					localStorage.setItem('workTasks', JSON.stringify(taskArr));
 				}
 			}
 		}
 
-		if(clickedTask.classList.contains('otherTasks')) {
+		if (clickedTask.classList.contains('otherTasks')) {
 			taskArr = JSON.parse(localStorage.getItem('otherTasks'));
 			taskCategory = 'otherTasks';
 
-			for(let i = 0; i < taskArr.length; i++) {
-				if(taskArr[i].id === clickedTaskId) {
+			for (let i = 0; i < taskArr.length; i++) {
+				if (taskArr[i].id === clickedTaskId) {
 					taskArr.splice(taskArr[i], 1); //remove matched element
 					localStorage.setItem('otherTasks', JSON.stringify(taskArr));
 				}
@@ -325,7 +325,7 @@ function deleteTask(clickedTask, clickedButton) {
 function cleanLocalStorage(taskCategory) {
 	let taskArr = JSON.parse(localStorage.getItem(taskCategory));
 
-	if(!taskArr.length) {
+	if (!taskArr.length) {
 		localStorage.removeItem(taskCategory);
 	}
 }
@@ -334,7 +334,7 @@ function avoidSpacedString() {
 	//detect spaced string
 	let taskTitle = document.getElementById('taskTitle').value;
 
-	if(!taskTitle.replace(/\s/g, '').length) {
+	if (!taskTitle.replace(/\s/g, '').length) {
 		alert('Empty spaces? Nope.');
 		return false;
 	}
