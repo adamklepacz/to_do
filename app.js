@@ -274,7 +274,7 @@ function doneTask(clickedTask, clickedButton) {
 	fetchList(taskCategory);
 }
 
-function	deleteTask(clickedTask, clickedButton) {
+function deleteTask(clickedTask, clickedButton) {
 	let buttonId = clickedButton.getAttribute('id'),
 			clickedTaskId = clickedTask.getAttribute('id'),
 			
