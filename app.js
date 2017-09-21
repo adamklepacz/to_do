@@ -77,84 +77,91 @@ function handleTaskDone(e) {
 function saveTask(e) {
 	e.preventDefault(); //prevent page reload
 	
-	document.getElementById('taskArea').style.display = "block";
+	if(avoidSpacedString()) {
+		document.getElementById('taskArea').style.display = "block";
 	
-	let taskTitle = document.getElementById('taskTitle').value,
-			taskPriority = document.getElementById('taskPriority').value,
-			taskCategory = document.getElementById('taskCategory').value += "Tasks",
-			taskId = makeId(),
-			isTaskDone = false, //on the very beginning newTask is always NOT DONE(false)
-			
-			creationTaskForm = document.getElementById('creationTaskForm'),
-	
-			newTask = {};	//init empty object for storing new task
-	
-	newTask = {
-		title: taskTitle,
-		priority: taskPriority,
-		category: taskCategory,
-		id: taskId,
-		isTaskDone: isTaskDone //boolean
-	};
+		let taskTitle = document.getElementById('taskTitle').value,
+				taskPriority = document.getElementById('taskPriority').value,
+				taskCategory = document.getElementById('taskCategory').value += "Tasks",
+				taskId = makeId(),
+				isTaskDone = false, //on the very beginning newTask is always NOT DONE(false)
+
+				creationTaskForm = document.getElementById('creationTaskForm'),
+
+				newTask = {};	//init empty object for storing new task
+
+		newTask = {
+			title: taskTitle,
+			priority: taskPriority,
+			category: taskCategory,
+			id: taskId,
+			isTaskDone: isTaskDone //boolean
+		};
+
+
+		let homeTasksArr = [],
+				workTaskArr = [],
+				otherTaskArr = [];
+
+
+		//if localStorage is empty
+		if(localStorage.getItem(taskCategory) === null) {
+			if(newTask.category === "homeTasks") {
+				homeTasksArr = [];
+				homeTasksArr.push(newTask)
+
+				//convert homeTaskArr(array) to string and set it up to localStorage
+				localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
+			}
+			if(newTask.category === "workTasks") {
+				workTaskArr = [];
+				workTaskArr.push(newTask);
+
+				//convert workTaskArr to string and set it up to localstorage
+				localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
+			}
+			if(newTask.category === "otherTasks") {
+				otherTaskArr = [];
+				otherTaskArr.push(newTask);
+
+				//convert otherTaskArr to string and set it up to localstorage
+				localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+			}
+		} else { //if there is something in localStorage 
+			if(newTask.category === "homeTasks") {
+				//parse string stored in localstorage to array
+				homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
+				homeTasksArr.push(newTask); //push new task
+
+				//re-set it up to local storage
+				localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
+			}
+			if(newTask.category === "workTasks") {
+				//parse string stored in localstorage to array
+				workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
+				workTaskArr.push(newTask); //push new task
+
+				//re-set it up to local storage
+				localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
+			}
+			if(newTask.category === "otherTasks") {
+				//parse string stored in localstorage to array
+				otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
+				otherTaskArr.push(newTask); //push new task
+
+				//re-set it up to local storage
+				localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+			}
+		} 
 		
-	
-	let homeTasksArr = [],
-			workTaskArr = [],
-			otherTaskArr = [];
-	
-	
-	//if localStorage is empty
-	if(localStorage.getItem(taskCategory) === null) {
-		if(newTask.category === "homeTasks") {
-			homeTasksArr = [];
-			homeTasksArr.push(newTask)
-			
-			//convert homeTaskArr(array) to string and set it up to localStorage
-			localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
-		}
-		if(newTask.category === "workTasks") {
-			workTaskArr = [];
-			workTaskArr.push(newTask);
-			
-			//convert workTaskArr to string and set it up to localstorage
-			localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
-		}
-		if(newTask.category === "otherTasks") {
-			otherTaskArr = [];
-			otherTaskArr.push(newTask);
-			
-			//convert otherTaskArr to string and set it up to localstorage
-			localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
-		}
-	} else { //if there is something in localStorage 
-		if(newTask.category === "homeTasks") {
-			//parse string stored in localstorage to array
-			homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
-			homeTasksArr.push(newTask); //push new task
-			
-			//re-set it up to local storage
-			localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
-		}
-		if(newTask.category === "workTasks") {
-			//parse string stored in localstorage to array
-			workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
-			workTaskArr.push(newTask); //push new task
-			
-			//re-set it up to local storage
-			localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
-		}
-		if(newTask.category === "otherTasks") {
-			//parse string stored in localstorage to array
-			otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
-			otherTaskArr.push(newTask); //push new task
-			
-			//re-set it up to local storage
-			localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
-		}
-	} 
+		fetchList(taskCategory);
+		
+	}	else {
+		return;
+	}
 	creationTaskForm.reset();
 	
-	fetchList(taskCategory);
+	
 }
 
 //fetch list using itemKeyCategory form localstorage
@@ -181,18 +188,11 @@ function fetchList(taskCategory) {
 					
 					taskBorder;  //task border
 					
-		
 			//check priority and set border color
 			if(priority === "High") taskBorder = 'border border-danger';
 			if(priority === "Medium") taskBorder = 'border border-warning';
 			if(priority === "Low") taskBorder = 'border border-info';
 			
-			
-		 
-			/* TO-DO
-			** colorize task background
-			** color based on task priority
-			*/
 			result.innerHTML +=
 					`
 						<li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
@@ -322,16 +322,25 @@ function	deleteTask(clickedTask, clickedButton) {
 			}
 		}
 	}
+	cleanLocalStorage(taskCategory);
 	fetchList(taskCategory);
 	}, 500);
 }
 
-	//small validation, do not store data in object when there is empty string in taskTitle
-	/* TO-DO */
-	//create validation function
-	// I have to create here more accurate validaton rules
-	// for multiple spaces 
-	// for multiple numbers  e.t.c
-	//	if(taskTitle == "") {
-	//		return;
-	//	} else {
+function cleanLocalStorage(taskCategory) {
+	let taskArr = JSON.parse(localStorage.getItem(taskCategory));
+	
+	if(!taskArr.length) {
+		localStorage.removeItem(taskCategory);
+	}
+}
+
+function avoidSpacedString() {
+	//detect spaced string
+	let taskTitle = document.getElementById('taskTitle').value;
+	
+	if (!taskTitle.replace(/\s/g, '').length) {
+    return false;
+	}
+	return true;
+}
