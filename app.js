@@ -182,7 +182,7 @@ function fetchList(taskCategory) {
 		
 		for(let i = 0; i < tasksArr.length; i++) {
 			let title = tasksArr[i].title,
-					priority = tasksArr[i].priority, //will be used later to colorize task background
+					priority = tasksArr[i].priority,
 					category = tasksArr[i].category,
 					id = tasksArr[i].id,
 					isDone = tasksArr[i].isTaskDone,
@@ -274,10 +274,6 @@ function doneTask(clickedTask, clickedButton) {
 	fetchList(taskCategory);
 }
 
-/* TO-DO
-** Remove empty object from 
-** localStorage when taskArr is empty
-*/
 function	deleteTask(clickedTask, clickedButton) {
 	let buttonId = clickedButton.getAttribute('id'),
 			clickedTaskId = clickedTask.getAttribute('id'),
