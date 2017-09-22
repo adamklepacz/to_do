@@ -27,8 +27,8 @@ fetchTaskCount();
 
 //unique id for task
 function makeId() {
-  let text = "",
-    possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let text = "";
+  let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   for (var i = 0; i < 5; i++) {
     text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -42,8 +42,8 @@ function handleTaskDelete(e) {
   e = event || window.event;
   e.target = e.target || e.srcElement;
 
-  let clickedButton = e.target,
-    clickedTask = e.target.closest('li.taskItem');
+  let clickedButton = e.target;
+  let clickedTask = e.target.closest('li.taskItem');
 
   //Climb up the document tree, check if clickedButton is a <button> and
   //does it have deleteTask class
@@ -61,8 +61,8 @@ function handleTaskDone(e) {
   e = event || window.event;
   e.target = e.target || e.srcElement;
 
-  let clickedButton = e.target,
-    clickedTask = e.target.closest('li.taskItem');
+  let clickedButton = e.target;
+  let clickedTask = e.target.closest('li.taskItem');
 
   //Climb up the document tree, check if clickedButton is a <button> and
   //does it have doneTask class
@@ -81,15 +81,15 @@ function saveTask(e) {
   if (avoidSpacedString()) {
     document.getElementById('taskArea').style.display = "block";
 
-    let taskTitle = document.getElementById('taskTitle').value,
-      taskPriority = document.getElementById('taskPriority').value,
-      taskCategory = document.getElementById('taskCategory').value += "Tasks",
-      taskId = makeId(),
-      isTaskDone = false, //on the very beginning newTask is always NOT DONE(false)
+    let taskTitle = document.getElementById('taskTitle').value;
+    let taskPriority = document.getElementById('taskPriority').value;
+    let taskCategory = document.getElementById('taskCategory').value += "Tasks";
+    let taskId = makeId();
+    let isTaskDone = false; //on the very beginning newTask is always NOT DONE(false)
 
-      creationTaskForm = document.getElementById('creationTaskForm'),
+    let creationTaskForm = document.getElementById('creationTaskForm');
 
-      newTask = {}; //init empty object for storing new task
+    let newTask = {}; //init empty object for storing new task
 
     newTask = {
       title: taskTitle,
@@ -99,9 +99,9 @@ function saveTask(e) {
       isTaskDone: isTaskDone //boolean
     };
 
-    let homeTasksArr = [],
-      workTaskArr = [],
-      otherTaskArr = [];
+    let homeTasksArr = [];
+    let workTaskArr = [];
+    let otherTaskArr = [];
 
     //if localStorage is empty
     if (localStorage.getItem(taskCategory) === null) {
@@ -164,11 +164,11 @@ function saveTask(e) {
 
 //fetch list using itemKeyCategory form localstorage
 function fetchList(taskCategory) {
-  let tasksArr = JSON.parse(localStorage.getItem(taskCategory)),
+  let tasksArr = JSON.parse(localStorage.getItem(taskCategory));
 
-    //get outputs for category and result(task list)
-    resultCategory = document.getElementById('taskCategoryOutput'),
-    result = document.getElementById('taskOutput');
+  //get outputs for category and result(task list)
+  let resultCategory = document.getElementById('taskCategoryOutput');
+  let result = document.getElementById('taskOutput');
 
   if (tasksArr) {
     result.innerHTML = '';
@@ -178,13 +178,13 @@ function fetchList(taskCategory) {
     document.getElementById('taskArea').style.display = "block";
 
     for (let i = 0; i < tasksArr.length; i++) {
-      let title = tasksArr[i].title,
-        priority = tasksArr[i].priority,
-        category = tasksArr[i].category,
-        id = tasksArr[i].id,
-        isDone = tasksArr[i].isTaskDone,
+      let title = tasksArr[i].title;
+      let priority = tasksArr[i].priority;
+      let category = tasksArr[i].category;
+      let id = tasksArr[i].id;
+      let isDone = tasksArr[i].isTaskDone;
 
-        taskBorder; //task border
+      let taskBorder; //task border
 
       //check priority and set border color
       if (priority === "High") taskBorder = 'border border-danger';
@@ -193,13 +193,13 @@ function fetchList(taskCategory) {
 
       result.innerHTML +=
         `
-<li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
-<div class="btn-group float-right">
-<button id="${id}" class="btn btn-secondary doneTask">Done</button>
-<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
-</div>
-</li>
-`;
+          <li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
+            <div class="btn-group float-right">
+              <button id="${id}" class="btn btn-secondary doneTask">Done</button>
+              <button id="${id}" class="btn btn-danger deleteTask">Delete</button>
+            </div>
+          </li>
+        `;
       crossThroughTask(id, isDone);
     }
   } else {
@@ -209,8 +209,8 @@ function fetchList(taskCategory) {
 }
 
 function crossThroughTask(id, isDone) {
-  let currentTask = document.getElementById(id),
-    taskCategory;
+  let currentTask = document.getElementById(id);
+  let taskCategory;
 
   if (isDone) {
     currentTask.style.textDecoration = "line-through";
@@ -220,12 +220,12 @@ function crossThroughTask(id, isDone) {
 }
 
 function doneTask(clickedTask, clickedButton) {
-  let buttonId = clickedButton.getAttribute('id'),
-    clickedTaskId = clickedTask.getAttribute('id'),
-    isDone, //boolean
+  let buttonId = clickedButton.getAttribute('id');
+  let clickedTaskId = clickedTask.getAttribute('id');
+  let isDone; //boolean
 
-    taskArr = [],
-    taskCategory = "";
+  let taskArr = [];
+  let taskCategory = "";
 
   if (clickedTask.classList.contains('homeTasks')) {
     taskArr = JSON.parse(localStorage.getItem('homeTasks'));
@@ -272,11 +272,11 @@ function doneTask(clickedTask, clickedButton) {
 }
 
 function deleteTask(clickedTask, clickedButton) {
-  let buttonId = clickedButton.getAttribute('id'),
-    clickedTaskId = clickedTask.getAttribute('id'),
+  let buttonId = clickedButton.getAttribute('id');
+  let clickedTaskId = clickedTask.getAttribute('id');
 
-    taskArr = [],
-    taskCategory = "";
+  let taskArr = [];
+  let taskCategory = "";
 
   clickedTask.classList.add("bg-danger");
 
@@ -343,36 +343,20 @@ function avoidSpacedString() {
 
 function fetchTaskCount() {
   //count home tasks
-  let homeTaskArr = JSON.parse(localStorage.getItem('homeTasks')) || [],
-    workTaskArr = JSON.parse(localStorage.getItem('workTasks')) || [],
-    otherTasksArr = JSON.parse(localStorage.getItem('otherTasks')) || [],
+  let homeTaskArr = JSON.parse(localStorage.getItem('homeTasks')) || [];
+  let workTaskArr = JSON.parse(localStorage.getItem('workTasks')) || [];
+  let otherTasksArr = JSON.parse(localStorage.getItem('otherTasks')) || [];
 
-    homeTaskCount = homeTaskArr.length,
-    workTaskCount = workTaskArr.length,
-    otherTaskCount = otherTasksArr.length;
+  let homeTaskCount = homeTaskArr.length;
+  let workTaskCount = workTaskArr.length;
+  let otherTaskCount = otherTasksArr.length;
 
   //fetch badges
-  let homeTaskCounter = document.getElementById('homeTaskCounter'),
-    workTaskCounter = document.getElementById('workTaskCounter'),
-    otherTaskCounter = document.getElementById('otherTaskCounter');
+  let homeTaskCounter = document.getElementById('homeTaskCounter');
+  let workTaskCounter = document.getElementById('workTaskCounter');
+  let otherTaskCounter = document.getElementById('otherTaskCounter');
 
   homeTaskCounter.innerHTML = homeTaskCount;
   workTaskCounter.innerHTML = workTaskCount;
   otherTaskCounter.innerHTML = otherTaskCount;
-}
-kCount;
-workTaskCounter.innerHTML = workTaskCount;
-otherTaskCounter.innerHTML = otherTaskCount;
-}
-kCount;
-workTaskCounter.innerHTML = workTaskCount;
-otherTaskCounter.innerHTML = otherTaskCount;
-}
-kCount;
-workTaskCounter.innerHTML = workTaskCount;
-otherTaskCounter.innerHTML = otherTaskCount;
-}
-kCount;
-workTaskCounter.innerHTML = workTaskCount;
-otherTaskCounter.innerHTML = otherTaskCount;
 }
