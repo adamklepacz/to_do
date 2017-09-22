@@ -27,8 +27,8 @@ fetchTaskCount();
 
 //unique id for task
 function makeId() {
-	let text = "";
-	let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	let text = "",
+		possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
 	for (var i = 0; i < 5; i++) {
 		text += possible.charAt(Math.floor(Math.random() * possible.length));
@@ -359,4 +359,20 @@ function fetchTaskCount() {
 	homeTaskCounter.innerHTML = homeTaskCount;
 	workTaskCounter.innerHTML = workTaskCount;
 	otherTaskCounter.innerHTML = otherTaskCount;
+}
+kCount;
+workTaskCounter.innerHTML = workTaskCount;
+otherTaskCounter.innerHTML = otherTaskCount;
+}
+kCount;
+workTaskCounter.innerHTML = workTaskCount;
+otherTaskCounter.innerHTML = otherTaskCount;
+}
+kCount;
+workTaskCounter.innerHTML = workTaskCount;
+otherTaskCounter.innerHTML = otherTaskCount;
+}
+kCount;
+workTaskCounter.innerHTML = workTaskCount;
+otherTaskCounter.innerHTML = otherTaskCount;
 }
