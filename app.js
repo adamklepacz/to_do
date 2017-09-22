@@ -193,13 +193,13 @@ function fetchList(taskCategory) {
 
 			result.innerHTML +=
 				`
-						<li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
-							<div class="btn-group float-right">
-								<button id="${id}" class="btn btn-secondary doneTask">Done</button>
-								<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
-							</div>
-						</li>
-					`;
+<li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
+<div class="btn-group float-right">
+<button id="${id}" class="btn btn-secondary doneTask">Done</button>
+<button id="${id}" class="btn btn-danger deleteTask">Delete</button>
+</div>
+</li>
+`;
 			crossThroughTask(id, isDone);
 		}
 	} else {
