@@ -1,4 +1,4 @@
-/* TO-DO APP 
+/* TO-DO APP
  ** Author: Adam Klepacz
  ** Playground app in plain JS
  ** 2017
@@ -6,13 +6,13 @@
 document.getElementById('creationTaskForm').addEventListener('submit', saveTask);
 
 //event listeneres for "check task" section
-document.getElementById('showHomeTasks').addEventListener('click', function () {
+document.getElementById('showHomeTasks').addEventListener('click', function() {
 	fetchList('homeTasks');
 }, true);
-document.getElementById('showWorkTasks').addEventListener('click', function () {
+document.getElementById('showWorkTasks').addEventListener('click', function() {
 	fetchList('workTasks');
 }, true);
-document.getElementById('showOtherTasks').addEventListener('click', function () {
+document.getElementById('showOtherTasks').addEventListener('click', function() {
 	fetchList('otherTasks');
 }, true);
 
@@ -45,7 +45,7 @@ function handleTaskDelete(e) {
 	let clickedButton = e.target,
 		clickedTask = e.target.closest('li.taskItem');
 
-	//Climb up the document tree, check if clickedButton is a <button> and 
+	//Climb up the document tree, check if clickedButton is a <button> and
 	//does it have deleteTask class
 	while (clickedButton) {
 		if (clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
@@ -126,7 +126,7 @@ function saveTask(e) {
 				//convert otherTaskArr to string and set it up to localstorage
 				localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
 			}
-		} else { //if there is something in localStorage 
+		} else { //if there is something in localStorage
 			if (newTask.category === "homeTasks") {
 				//parse string stored in localstorage to array
 				homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
@@ -280,7 +280,7 @@ function deleteTask(clickedTask, clickedButton) {
 
 	clickedTask.classList.add("bg-danger");
 
-	setTimeout(function () {
+	setTimeout(function() {
 		if (clickedTask.classList.contains('homeTasks')) {
 			taskArr = JSON.parse(localStorage.getItem('homeTasks'));
 			taskCategory = 'homeTasks';
