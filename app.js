@@ -16,16 +16,32 @@ document.getElementById('showOtherTasks').addEventListener('click', function() {
   fetchList('otherTasks');
 }, true);
 
-//event listeners to handle multiple "delete" and "done" buttons
-document.addEventListener('click', handleTaskDone, true);
-document.addEventListener('click', handleTaskDelete, true);
+//event listener to handle multiple "delete" and "done" buttons
+document.addEventListener('click', function(e) {
+  let clickedElement = e.target;
+  let clickedTask = e.target.closest('li.taskItem');
 
-//hide taskArea element at the very beginning
-document.getElementById('taskArea').style.display = "none";
+  while (clickedElement) {
+    if (clickedElement.nodeName === "BUTTON" && /actionBtn/.test(clickedElement.className)) {
+      let actionName = clickedElement.className; //deleteTask or doneTask
+      if (actionName.includes('doneTask')) actionName = 'doneTask';
+      if (actionName.includes('deleteTask')) actionName = 'deleteTask';
+
+      switch (actionName) {
+        case 'deleteTask':
+          deleteTask(clickedTask, clickedElement);
+          break;
+        case 'doneTask':
+          doneTask(clickedTask, clickedElement);
+          break;
+      }
+    }
+    clickedElement = clickedElement.parentNode;
+  }
+}, true);
 
 fetchTaskCount();
 
-//unique id for task
 function makeId() {
   let text = "";
   let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -37,41 +53,46 @@ function makeId() {
   return text;
 }
 
-function handleTaskDelete(e) {
-  //event for IE
-  e = event || window.event;
-  e.target = e.target || e.srcElement;
+//check if id exists in collection of previous ids
+function idExist(id) {
+  let ids = []; //collection of previous id's
 
-  let clickedButton = e.target;
-  let clickedTask = e.target.closest('li.taskItem');
+  let homeTaskArr = JSON.parse(localStorage.getItem('homeTasks')) || [];
+  let workTaskArr = JSON.parse(localStorage.getItem('workTasks')) || [];
+  let otherTaskArr = JSON.parse(localStorage.getItem('otherTasks')) || [];
 
-  //Climb up the document tree, check if clickedButton is a <button> and
-  //does it have deleteTask class
-  while (clickedButton) {
-    if (clickedButton.nodeName === "BUTTON" && /deleteTask/.test(clickedButton.className)) {
-      deleteTask(clickedTask, clickedButton);
-      break;
+  homeTaskArr.forEach(function(el) {
+    let elId = el.id;
+    ids.push(elId);
+  });
+  workTaskArr.forEach(function(el) {
+    let elId = el.id;
+    ids.push(elId);
+  });
+  otherTaskArr.forEach(function(el) {
+    let elId = el.id;
+    ids.push(elId);
+  });
+
+  for (let i = 0; i < ids.length; i++) {
+    if (ids[i] === id) {
+      id = makeId();
+      return true;
     }
-    clickedButton = clickedButton.parentNode;
+    return false;
   }
 }
 
-function handleTaskDone(e) {
-  //event for IE
-  e = event || window.event;
-  e.target = e.target || e.srcElement;
+function assignId() {
+  let id;
 
-  let clickedButton = e.target;
-  let clickedTask = e.target.closest('li.taskItem');
+  while (true) {
+    id = makeId();
 
-  //Climb up the document tree, check if clickedButton is a <button> and
-  //does it have doneTask class
-  while (clickedButton) {
-    if (clickedButton.nodeName === "BUTTON" && /doneTask/.test(clickedButton.className)) {
-      doneTask(clickedTask, clickedButton);
-      break;
+    //if id is unique, return id
+    if (!idExist(id)) {
+      return id;
     }
-    clickedButton = clickedButton.parentNode;
   }
 }
 
@@ -84,7 +105,7 @@ function saveTask(e) {
     let taskTitle = document.getElementById('taskTitle').value;
     let taskPriority = document.getElementById('taskPriority').value;
     let taskCategory = document.getElementById('taskCategory').value += "Tasks";
-    let taskId = makeId();
+    let taskId = assignId();
     let isTaskDone = false; //on the very beginning newTask is always NOT DONE(false)
 
     let creationTaskForm = document.getElementById('creationTaskForm');
@@ -105,58 +126,52 @@ function saveTask(e) {
 
     //if localStorage is empty
     if (localStorage.getItem(taskCategory) === null) {
-      if (newTask.category === "homeTasks") {
-        homeTasksArr = [];
-        homeTasksArr.push(newTask)
+      switch (newTask.category) {
+        case 'homeTasks':
+          homeTasksArr = [];
+          homeTasksArr.push(newTask);
 
-        //convert homeTaskArr(array) to string and set it up to localStorage
-        localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
-      }
-      if (newTask.category === "workTasks") {
-        workTaskArr = [];
-        workTaskArr.push(newTask);
+          localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
+          break;
+        case 'workTasks':
+          workTaskArr = [];
 
-        //convert workTaskArr to string and set it up to localstorage
-        localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
-      }
-      if (newTask.category === "otherTasks") {
-        otherTaskArr = [];
-        otherTaskArr.push(newTask);
+          workTaskArr.push(newTask);
+          localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
+          break;
+        case 'otherTasks':
+          otherTaskArr = [];
 
-        //convert otherTaskArr to string and set it up to localstorage
-        localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+          otherTaskArr.push(newTask);
+          localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+          break;
       }
     } else { //if there is something in localStorage
-      if (newTask.category === "homeTasks") {
-        //parse string stored in localstorage to array
-        homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
-        homeTasksArr.push(newTask); //push new task
+      switch (newTask.category) {
+        case 'homeTasks':
+          //parse string stored in localstorage to array
+          homeTasksArr = JSON.parse(localStorage.getItem('homeTasks'));
+          homeTasksArr.push(newTask);
 
-        //re-set it up to local storage
-        localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
-      }
-      if (newTask.category === "workTasks") {
-        //parse string stored in localstorage to array
-        workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
-        workTaskArr.push(newTask); //push new task
+          localStorage.setItem('homeTasks', JSON.stringify(homeTasksArr));
+          break;
+        case 'workTasks':
+          //parse string stored in localstorage to array
+          workTaskArr = JSON.parse(localStorage.getItem('workTasks'));
+          workTaskArr.push(newTask);
 
-        //re-set it up to local storage
-        localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
-      }
-      if (newTask.category === "otherTasks") {
-        //parse string stored in localstorage to array
-        otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
-        otherTaskArr.push(newTask); //push new task
+          localStorage.setItem('workTasks', JSON.stringify(workTaskArr));
+          break;
+        case 'otherTasks':
+          //parse string stored in localstorage to array
+          otherTaskArr = JSON.parse(localStorage.getItem('otherTasks'));
+          otherTaskArr.push(newTask);
 
-        //re-set it up to local storage
-        localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+          localStorage.setItem('otherTasks', JSON.stringify(otherTaskArr));
+          break;
       }
     }
-
     fetchList(taskCategory);
-
-  } else {
-    return;
   }
   creationTaskForm.reset();
   fetchTaskCount();
@@ -164,7 +179,12 @@ function saveTask(e) {
 
 //fetch list using itemKeyCategory form localstorage
 function fetchList(taskCategory) {
-  let tasksArr = JSON.parse(localStorage.getItem(taskCategory));
+  let tasksArr = [];
+  try {
+    tasksArr = JSON.parse(localStorage.getItem(taskCategory));
+  } catch (error) {
+    //handle error
+  }
 
   //get outputs for category and result(task list)
   let resultCategory = document.getElementById('taskCategoryOutput');
@@ -186,17 +206,24 @@ function fetchList(taskCategory) {
 
       let taskBorder; //task border
 
-      //check priority and set border color
-      if (priority === "High") taskBorder = 'border border-danger';
-      if (priority === "Medium") taskBorder = 'border border-warning';
-      if (priority === "Low") taskBorder = 'border border-info';
+      switch (priority) {
+        case 'High':
+          taskBorder = 'border border-danger';
+          break;
+        case 'Medium':
+          taskBorder = 'border border-warning';
+          break;
+        case 'Low':
+          taskBorder = 'border border-info';
+          break;
+      }
 
       result.innerHTML +=
         `
-          <li id="${id}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
+          <li id="${id}" data-id-number="${id}" data-task-category="${category}" class="list-group-item mb-3 taskItem ${category} ${taskBorder}">${title}
             <div class="btn-group float-right">
-              <button id="${id}" class="btn btn-secondary doneTask">Done</button>
-              <button id="${id}" class="btn btn-danger deleteTask">Delete</button>
+              <button data-id-number="${id}" class="btn btn-secondary doneTask actionBtn">Done</button>
+              <button data-id-number="${id}" class="btn btn-danger deleteTask actionBtn">Delete</button>
             </div>
           </li>
         `;
@@ -220,60 +247,58 @@ function crossThroughTask(id, isDone) {
 }
 
 function doneTask(clickedTask, clickedButton) {
-  let buttonId = clickedButton.getAttribute('id');
-  let clickedTaskId = clickedTask.getAttribute('id');
+  let buttonId = clickedButton.getAttribute('data-id-number');
+  let clickedTaskId = clickedTask.getAttribute('data-id-number');
+  let category = clickedTask.getAttribute('data-task-category');
   let isDone; //boolean
 
   let taskArr = [];
-  let taskCategory = "";
 
-  if (clickedTask.classList.contains('homeTasks')) {
-    taskArr = JSON.parse(localStorage.getItem('homeTasks'));
-    taskCategory = 'homeTasks';
+  switch (category) {
+    case 'homeTasks':
+      taskArr = JSON.parse(localStorage.getItem('homeTasks'));
 
-    for (let i = 0; i < taskArr.length; i++) {
-      if (taskArr[i].id === clickedTaskId) {
-        isDone = taskArr[i].isTaskDone = true;
+      for (let i = 0; i < taskArr.length; i++) {
+        if (taskArr[i].id === clickedTaskId) {
+          isDone = taskArr[i].isTaskDone = true;
 
-        localStorage.setItem('homeTasks', JSON.stringify(taskArr));
-        crossThroughTask(clickedTaskId, isDone);
+          localStorage.setItem('homeTasks', JSON.stringify(taskArr));
+          crossThroughTask(clickedTaskId, isDone);
+        }
       }
-    }
-  }
+      break;
+    case 'workTasks':
+      taskArr = JSON.parse(localStorage.getItem('workTasks'));
 
-  if (clickedTask.classList.contains('workTasks')) {
-    taskArr = JSON.parse(localStorage.getItem('workTasks'));
-    taskCategory = 'workTasks';
+      for (let i = 0; i < taskArr.length; i++) {
+        if (taskArr[i].id === clickedTaskId) {
+          isDone = taskArr[i].isTaskDone = true;
 
-    for (let i = 0; i < taskArr.length; i++) {
-      if (taskArr[i].id === clickedTaskId) {
-        isDone = taskArr[i].isTaskDone = true;
-
-        localStorage.setItem('workTasks', JSON.stringify(taskArr));
-        crossThroughTask(clickedTaskId, isDone);
+          localStorage.setItem('workTasks', JSON.stringify(taskArr));
+          crossThroughTask(clickedTaskId, isDone);
+        }
       }
-    }
-  }
+      break;
+    case 'otherTasks':
+      taskArr = JSON.parse(localStorage.getItem('otherTasks'));
 
-  if (clickedTask.classList.contains('otherTasks')) {
-    taskArr = JSON.parse(localStorage.getItem('otherTasks'));
-    taskCategory = 'otherTasks';
+      for (let i = 0; i < taskArr.length; i++) {
+        if (taskArr[i].id === clickedTaskId) {
+          isDone = taskArr[i].isTaskDone = true;
 
-    for (let i = 0; i < taskArr.length; i++) {
-      if (taskArr[i].id === clickedTaskId) {
-        isDone = taskArr[i].isTaskDone = true;
-
-        localStorage.setItem('otherTasks', JSON.stringify(taskArr));
-        crossThroughTask(clickedTaskId, isDone);
+          localStorage.setItem('otherTasks', JSON.stringify(taskArr));
+          crossThroughTask(clickedTaskId, isDone);
+        }
       }
-    }
+      break;
   }
-  fetchList(taskCategory);
+  fetchList(category);
 }
 
 function deleteTask(clickedTask, clickedButton) {
   let buttonId = clickedButton.getAttribute('id');
   let clickedTaskId = clickedTask.getAttribute('id');
+  let category = clickedTask.getAttribute('data-task-category');
 
   let taskArr = [];
   let taskCategory = "";
@@ -281,52 +306,50 @@ function deleteTask(clickedTask, clickedButton) {
   clickedTask.classList.add("bg-danger");
 
   setTimeout(function() {
-    if (clickedTask.classList.contains('homeTasks')) {
-      taskArr = JSON.parse(localStorage.getItem('homeTasks'));
-      taskCategory = 'homeTasks';
+    switch (category) {
+      case 'homeTasks':
+        taskArr = JSON.parse(localStorage.getItem('homeTasks'));
 
-      for (let i = 0; i < taskArr.length; i++) {
-        if (taskArr[i].id === clickedTaskId) {
-          taskArr.splice(taskArr[i], 1); //remove matched element
-          localStorage.setItem('homeTasks', JSON.stringify(taskArr));
+        for (let i = 0; i < taskArr.length; i++) {
+          if (taskArr[i].id === clickedTaskId) {
+            taskArr.splice(taskArr[i], 1); //remove matched element
+            localStorage.setItem('homeTasks', JSON.stringify(taskArr));
+          }
         }
-      }
-    }
+        break;
+      case 'workTasks':
+        taskArr = JSON.parse(localStorage.getItem('workTasks'));
 
-    if (clickedTask.classList.contains('workTasks')) {
-      taskArr = JSON.parse(localStorage.getItem('workTasks'));
-      taskCategory = 'workTasks';
-
-      for (let i = 0; i < taskArr.length; i++) {
-        if (taskArr[i].id === clickedTaskId) {
-          taskArr.splice(taskArr[i], 1); //remove matched element
-          localStorage.setItem('workTasks', JSON.stringify(taskArr));
+        for (let i = 0; i < taskArr.length; i++) {
+          if (taskArr[i].id === clickedTaskId) {
+            taskArr.splice(taskArr[i], 1); //remove matched element
+            localStorage.setItem('workTasks', JSON.stringify(taskArr));
+          }
         }
-      }
-    }
+        break;
+      case 'otherTasks':
+        taskArr = JSON.parse(localStorage.getItem('otherTasks'));
+        taskCategory = 'otherTasks';
 
-    if (clickedTask.classList.contains('otherTasks')) {
-      taskArr = JSON.parse(localStorage.getItem('otherTasks'));
-      taskCategory = 'otherTasks';
-
-      for (let i = 0; i < taskArr.length; i++) {
-        if (taskArr[i].id === clickedTaskId) {
-          taskArr.splice(taskArr[i], 1); //remove matched element
-          localStorage.setItem('otherTasks', JSON.stringify(taskArr));
+        for (let i = 0; i < taskArr.length; i++) {
+          if (taskArr[i].id === clickedTaskId) {
+            taskArr.splice(taskArr[i], 1); //remove matched element
+            localStorage.setItem('otherTasks', JSON.stringify(taskArr));
+          }
         }
-      }
+        break;
     }
-    cleanLocalStorage(taskCategory);
-    fetchList(taskCategory);
+    cleanLocalStorage(category);
+    fetchList(category);
     fetchTaskCount();
   }, 500);
 }
 
-function cleanLocalStorage(taskCategory) {
-  let taskArr = JSON.parse(localStorage.getItem(taskCategory));
+function cleanLocalStorage(category) {
+  let taskArr = JSON.parse(localStorage.getItem(category));
 
   if (!taskArr.length) {
-    localStorage.removeItem(taskCategory);
+    localStorage.removeItem(category);
   }
 }
 
