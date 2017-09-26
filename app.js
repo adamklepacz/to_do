@@ -29,7 +29,7 @@ document.addEventListener('click', function(e) {
 
       switch (actionName) {
         case 'deleteTask':
-          deleteTask(clickedTask, clickedElement);
+          deleteTask2(clickedTask); //tu zmieniłem
           break;
         case 'doneTask':
           doneTask(clickedTask, clickedElement);
@@ -61,6 +61,14 @@ function idExist(id) {
   let workTaskArr = JSON.parse(localStorage.getItem('workTasks')) || [];
   let otherTaskArr = JSON.parse(localStorage.getItem('otherTasks')) || [];
 
+  let generalArr = homeTaskArr.concat(workTaskArr, otherTaskArr);
+
+  generalArr.forEach(function(el) {
+    let elId = el.id;
+    ids.push(elId);
+  });
+  console.log(ids);
+  /*
   homeTaskArr.forEach(function(el) {
     let elId = el.id;
     ids.push(elId);
@@ -73,6 +81,7 @@ function idExist(id) {
     let elId = el.id;
     ids.push(elId);
   });
+  */
 
   for (let i = 0; i < ids.length; i++) {
     if (ids[i] === id) {
@@ -98,6 +107,7 @@ function assignId() {
 
 function saveTask(e) {
   e.preventDefault(); //prevent page reload
+  let taskId;
 
   if (avoidSpacedString()) {
     document.getElementById('taskArea').style.display = "block";
@@ -105,7 +115,7 @@ function saveTask(e) {
     let taskTitle = document.getElementById('taskTitle').value;
     let taskPriority = document.getElementById('taskPriority').value;
     let taskCategory = document.getElementById('taskCategory').value += "Tasks";
-    let taskId = assignId();
+    taskId = assignId();
     let isTaskDone = false; //on the very beginning newTask is always NOT DONE(false)
 
     let creationTaskForm = document.getElementById('creationTaskForm');
@@ -175,6 +185,7 @@ function saveTask(e) {
   }
   creationTaskForm.reset();
   fetchTaskCount();
+  idExist(taskId);
 }
 
 //fetch list using itemKeyCategory form localstorage
@@ -296,12 +307,11 @@ function doneTask(clickedTask, clickedButton) {
 }
 
 function deleteTask(clickedTask, clickedButton) {
-  let buttonId = clickedButton.getAttribute('id');
-  let clickedTaskId = clickedTask.getAttribute('id');
+  let buttonId = clickedButton.getAttribute('data-id-number');
+  let clickedTaskId = clickedTask.getAttribute('data-id-number');
   let category = clickedTask.getAttribute('data-task-category');
 
   let taskArr = [];
-  let taskCategory = "";
 
   clickedTask.classList.add("bg-danger");
 
@@ -312,6 +322,7 @@ function deleteTask(clickedTask, clickedButton) {
 
         for (let i = 0; i < taskArr.length; i++) {
           if (taskArr[i].id === clickedTaskId) {
+            console.log(taskArr[i].id);
             taskArr.splice(taskArr[i], 1); //remove matched element
             localStorage.setItem('homeTasks', JSON.stringify(taskArr));
           }
@@ -322,6 +333,7 @@ function deleteTask(clickedTask, clickedButton) {
 
         for (let i = 0; i < taskArr.length; i++) {
           if (taskArr[i].id === clickedTaskId) {
+            console.log(taskArr[i].id);
             taskArr.splice(taskArr[i], 1); //remove matched element
             localStorage.setItem('workTasks', JSON.stringify(taskArr));
           }
@@ -329,7 +341,6 @@ function deleteTask(clickedTask, clickedButton) {
         break;
       case 'otherTasks':
         taskArr = JSON.parse(localStorage.getItem('otherTasks'));
-        taskCategory = 'otherTasks';
 
         for (let i = 0; i < taskArr.length; i++) {
           if (taskArr[i].id === clickedTaskId) {
@@ -343,6 +354,52 @@ function deleteTask(clickedTask, clickedButton) {
     fetchList(category);
     fetchTaskCount();
   }, 500);
+}
+
+function deleteTask2(clickedTask) {
+  let clickedTaskId = clickedTask.getAttribute('data-id-number');
+  let category = clickedTask.getAttribute('data-task-category');
+  console.log(clickedTaskId, category);
+  let taskArr = [];
+
+  switch (category) {
+    case 'homeTasks':
+      taskArr = JSON.parse(localStorage.getItem('homeTasks'));
+
+      for (let i = 0; i < taskArr.length; i++) {
+        if (taskArr[i].id === clickedTaskId) {
+          taskArr.splice(taskArr[i], 1);
+          console.log(taskArr);
+          localStorage.setItem('homeTasks', JSON.stringify(taskArr));
+        }
+      }
+      break;
+    case 'workTasks':
+      taskArr = JSON.parse(localStorage.getItem('workTasks'));
+
+      for (let i = 0; i < taskArr.length; i++) {
+        if (taskArr[i].id === clickedTaskId) {
+          taskArr.splice(taskArr[i], 1);
+          console.log(taskArr);
+          localStorage.setItem('workTasks', JSON.stringify(taskArr));
+        }
+      }
+      break;
+    case 'otherTasks':
+      taskArr = JSON.parse(localStorage.getItem('otherTasks'));
+
+      for (let i = 0; i < taskArr.length; i++) {
+        if (taskArr[i].id === clickedTaskId) {
+          taskArr.splice(taskArr[i], 1);
+          console.log(taskArr);
+          localStorage.setItem('otherTasks', JSON.stringify(taskArr));
+        }
+      }
+      break;
+  }
+  cleanLocalStorage(category);
+  fetchList(category);
+  fetchTaskCount();
 }
 
 function cleanLocalStorage(category) {
