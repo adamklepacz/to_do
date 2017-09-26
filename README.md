@@ -2,8 +2,8 @@
 Mastering my vanilla JS skills. <br>
 Live demo:  https://adamklepacz.github.io/to_do/ <br>
 
-/* TO-DO APP
- ** Author: Adam Klepacz
- ** Playground app in plain JS
- ** 2017
+/* TO-DO APP <br>
+ ** Author: Adam Klepacz<br>
+ ** Playground app in plain JS<br>
+ ** 2017<br>
  */
