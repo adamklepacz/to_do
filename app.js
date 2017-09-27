@@ -29,10 +29,10 @@ document.addEventListener('click', function(e) {
 
       switch (actionName) {
         case 'deleteTask':
-          deleteTask2(clickedTask); //tu zmieniłem
+          deleteTask(clickedTask);
           break;
         case 'doneTask':
-          doneTask(clickedTask, clickedElement);
+          doneTask(clickedTask);
           break;
       }
     }
@@ -55,36 +55,21 @@ function makeId() {
 
 //check if id exists in collection of previous ids
 function idExist(id) {
-  let ids = []; //collection of previous id's
+  let allIds = []; //collection of previous id's
 
   let homeTaskArr = JSON.parse(localStorage.getItem('homeTasks')) || [];
   let workTaskArr = JSON.parse(localStorage.getItem('workTasks')) || [];
   let otherTaskArr = JSON.parse(localStorage.getItem('otherTasks')) || [];
 
-  let generalArr = homeTaskArr.concat(workTaskArr, otherTaskArr);
+  let allTasksArr = homeTaskArr.concat(workTaskArr, otherTaskArr);
 
-  generalArr.forEach(function(el) {
+  allTasksArr.forEach(function(el) {
     let elId = el.id;
-    ids.push(elId);
+    allIds.push(elId);
   });
-  console.log(ids);
-  /*
-  homeTaskArr.forEach(function(el) {
-    let elId = el.id;
-    ids.push(elId);
-  });
-  workTaskArr.forEach(function(el) {
-    let elId = el.id;
-    ids.push(elId);
-  });
-  otherTaskArr.forEach(function(el) {
-    let elId = el.id;
-    ids.push(elId);
-  });
-  */
 
-  for (let i = 0; i < ids.length; i++) {
-    if (ids[i] === id) {
+  for (let i = 0; i < allIds.length; i++) {
+    if (allIds[i] === id) {
       id = makeId();
       return true;
     }
@@ -257,8 +242,7 @@ function crossThroughTask(id, isDone) {
   }
 }
 
-function doneTask(clickedTask, clickedButton) {
-  let buttonId = clickedButton.getAttribute('data-id-number');
+function doneTask(clickedTask) {
   let clickedTaskId = clickedTask.getAttribute('data-id-number');
   let category = clickedTask.getAttribute('data-task-category');
   let isDone; //boolean
@@ -306,8 +290,7 @@ function doneTask(clickedTask, clickedButton) {
   fetchList(category);
 }
 
-function deleteTask(clickedTask, clickedButton) {
-  let buttonId = clickedButton.getAttribute('data-id-number');
+function deleteTask(clickedTask) {
   let clickedTaskId = clickedTask.getAttribute('data-id-number');
   let category = clickedTask.getAttribute('data-task-category');
 
@@ -322,8 +305,9 @@ function deleteTask(clickedTask, clickedButton) {
 
         for (let i = 0; i < taskArr.length; i++) {
           if (taskArr[i].id === clickedTaskId) {
-            console.log(taskArr[i].id);
-            taskArr.splice(taskArr[i], 1); //remove matched element
+            let index = taskArr.indexOf(taskArr[i]);
+
+            taskArr.splice(index, 1); //remove matched element
             localStorage.setItem('homeTasks', JSON.stringify(taskArr));
           }
         }
@@ -333,8 +317,9 @@ function deleteTask(clickedTask, clickedButton) {
 
         for (let i = 0; i < taskArr.length; i++) {
           if (taskArr[i].id === clickedTaskId) {
-            console.log(taskArr[i].id);
-            taskArr.splice(taskArr[i], 1); //remove matched element
+            let index = taskArr.indexOf(taskArr[i]);
+
+            taskArr.splice(index, 1); //remove matched element
             localStorage.setItem('workTasks', JSON.stringify(taskArr));
           }
         }
@@ -344,7 +329,9 @@ function deleteTask(clickedTask, clickedButton) {
 
         for (let i = 0; i < taskArr.length; i++) {
           if (taskArr[i].id === clickedTaskId) {
-            taskArr.splice(taskArr[i], 1); //remove matched element
+            let index = taskArr.indexOf(taskArr[i]);
+
+            taskArr.splice(index, 1); //remove matched element
             localStorage.setItem('otherTasks', JSON.stringify(taskArr));
           }
         }
@@ -354,52 +341,6 @@ function deleteTask(clickedTask, clickedButton) {
     fetchList(category);
     fetchTaskCount();
   }, 500);
-}
-
-function deleteTask2(clickedTask) {
-  let clickedTaskId = clickedTask.getAttribute('data-id-number');
-  let category = clickedTask.getAttribute('data-task-category');
-  console.log(clickedTaskId, category);
-  let taskArr = [];
-
-  switch (category) {
-    case 'homeTasks':
-      taskArr = JSON.parse(localStorage.getItem('homeTasks'));
-
-      for (let i = 0; i < taskArr.length; i++) {
-        if (taskArr[i].id === clickedTaskId) {
-          taskArr.splice(taskArr[i], 1);
-          console.log(taskArr);
-          localStorage.setItem('homeTasks', JSON.stringify(taskArr));
-        }
-      }
-      break;
-    case 'workTasks':
-      taskArr = JSON.parse(localStorage.getItem('workTasks'));
-
-      for (let i = 0; i < taskArr.length; i++) {
-        if (taskArr[i].id === clickedTaskId) {
-          taskArr.splice(taskArr[i], 1);
-          console.log(taskArr);
-          localStorage.setItem('workTasks', JSON.stringify(taskArr));
-        }
-      }
-      break;
-    case 'otherTasks':
-      taskArr = JSON.parse(localStorage.getItem('otherTasks'));
-
-      for (let i = 0; i < taskArr.length; i++) {
-        if (taskArr[i].id === clickedTaskId) {
-          taskArr.splice(taskArr[i], 1);
-          console.log(taskArr);
-          localStorage.setItem('otherTasks', JSON.stringify(taskArr));
-        }
-      }
-      break;
-  }
-  cleanLocalStorage(category);
-  fetchList(category);
-  fetchTaskCount();
 }
 
 function cleanLocalStorage(category) {
